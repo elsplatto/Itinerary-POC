@@ -1,0 +1,5 @@
+.idea/*
+dbScripts/*
+includes/db.php
+includes/site-settings.php
+.DS_Store

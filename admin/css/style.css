@@ -1,0 +1,276 @@
+/* Start - font-family variables */
+/* End - font-family variables */
+html, body {
+  font-size: 100%;
+  background: transparent !important; }
+
+body {
+  padding: 1rem 0 !important; }
+
+label {
+  clear: both;
+  display: block;
+  margin-top: 1rem;
+  position: relative; }
+
+input, select, textarea {
+  clear: left;
+  display: block;
+  font-family: "Inconsolata", sans-serif !important; }
+
+input[type="checkbox"], input[type="radio"] {
+  clear: none !important;
+  display: inline; }
+
+label input[type="checkbox"], label input[type="radio"] {
+  margin: 0; }
+
+.ajaxCheck {
+  position: absolute;
+  z-index: 10; }
+
+input[type="text"], input[type="password"] {
+  width: 28rem;
+  height: 2rem; }
+
+input[type="checkbox"] + label, input[type="radio"] + label {
+  margin-left: 0 !important;
+  margin-bottom: 0.5rem !important; }
+
+textarea {
+  height: 15rem !important;
+  resize: vertical; }
+
+textarea.small {
+  height: 2rem !important; }
+
+textarea.medium {
+  height: 5rem !important; }
+
+textarea.large {
+  height: 10rem !important; }
+
+select {
+  width: 28rem; }
+
+.tileList {
+  list-style: none;
+  overflow: hidden; }
+  .tileList li {
+    float: left;
+    cursor: pointer;
+    display: inline-block;
+    position: relative;
+    margin: 0 1rem 1rem 1rem; }
+  .tileList [data-map-tile-selected] .imgHolder:before, .tileList [data-itinerary-location-selected] .imgHolder:before, .tileList [data-route-tile-selected] .imgHolder:before {
+    position: absolute;
+    content: "";
+    width: 2rem;
+    height: 2rem;
+    top: 3rem;
+    right: 1.5rem;
+    background-image: url("img/adminIcons.png");
+    background-position: 0 -41px; }
+
+.ajaxCheck {
+  width: 1.563rem;
+  height: 1.5rem;
+  margin-left: 0;
+  margin-top: 0; }
+
+.ajaxCheck.okay:before {
+  content: "";
+  position: absolute;
+  width: 1.563rem;
+  height: 1.5rem;
+  top: 0;
+  left: 0;
+  background-image: url("img/adminIcons.png");
+  background-position: 0 -16px; }
+
+.ajaxCheck.problem:before {
+  content: "";
+  position: absolute;
+  width: 1.563rem;
+  height: 1.5rem;
+  top: 0;
+  left: 0;
+  background-image: url("img/adminIcons.png");
+  background-position: -29 -16px; }
+
+.photo-of-the-day {
+  position: absolute;
+  right: 2.5rem;
+  bottom: 0.25rem; }
+
+.setPicOfTheDay {
+  display: inline-block; }
+
+.instaImg {
+  position: relative; }
+  .instaImg .instaUser {
+    position: absolute;
+    z-index: 10;
+    top: 1rem;
+    left: 2rem; }
+
+.mapTiles, .locationTiles {
+  width: 100%;
+  height: auto;
+  outline: 2px solid grey;
+  overflow: hidden; }
+
+.red {
+  color: #f33000; }
+
+table.list {
+  margin-top: 1rem; }
+
+.list th, .list td {
+  padding: 0.5rem 1rem 0.5rem 0; }
+
+.google-maps img {
+  max-width: inherit; }
+
+.button[disabled] {
+  background-color: #b7b7b7; }
+  .button[disabled]:hover {
+    background-color: #b7b7b7; }
+
+.ribbon-wrapper {
+  width: 5.313rem;
+  height: 5.5rem;
+  overflow: hidden;
+  position: absolute;
+  top: -0.168rem;
+  right: 1.125rem; }
+
+.ribbon {
+  font: bold 0.75rem Sans-Serif;
+  color: #333333;
+  text-align: center;
+  text-shadow: rgba(255, 255, 255, 0.5) 0px 1px 0px;
+  -webkit-transform: rotate(45deg);
+  -moz-transform: rotate(45deg);
+  -ms-transform: rotate(45deg);
+  -o-transform: rotate(45deg);
+  position: relative;
+  padding: 7px 0;
+  left: -5px;
+  top: 1rem;
+  width: 7.5rem;
+  color: white;
+  -webkit-box-shadow: 0px 0px 3px rgba(0, 0, 0, 0.3);
+  -moz-box-shadow: 0px 0px 3px rgba(0, 0, 0, 0.3);
+  box-shadow: 0px 0px 3px rgba(0, 0, 0, 0.3); }
+  .ribbon:before, .ribbon:after {
+    content: "";
+    border-left: 3px solid transparent;
+    border-right: 3px solid transparent;
+    position: absolute;
+    bottom: -3px; }
+  .ribbon:before {
+    left: 0; }
+  .ribbon:after {
+    right: 0; }
+
+.ribbon.green {
+  background-color: #bfdc7a;
+  background-image: -webkit-gradient(linear, left top, left bottom, from(#bfdc7a), to(#8ebf45));
+  background-image: -webkit-linear-gradient(top, #bfdc7a, #8ebf45);
+  background-image: -moz-linear-gradient(top, #bfdc7a, #8ebf45);
+  background-image: -ms-linear-gradient(top, #bfdc7a, #8ebf45);
+  background-image: -o-linear-gradient(top, #bfdc7a, #8ebf45); }
+  .ribbon.green:before, .ribbon.green:after {
+    border-top: 3px solid #6e8900; }
+
+.ribbon.red {
+  background-color: #c10a0a;
+  background-image: -webkit-gradient(linear, left top, left bottom, from(#ec2727), to(#c10a0a));
+  background-image: -webkit-linear-gradient(top, #ec2727, #c10a0a);
+  background-image: -moz-linear-gradient(top, #ec2727, #c10a0a);
+  background-image: -ms-linear-gradient(top, #ec2727, #c10a0a);
+  background-image: -o-linear-gradient(top, #ec2727, #c10a0a); }
+  .ribbon.red:before, .ribbon.red:after {
+    border-top: 3px solid #891a00; }
+
+.cancel {
+  margin-left: 2rem; }
+
+a.showHide {
+  display: block; }
+
+.marginTop10 {
+  margin-top: 0.625rem !important; }
+
+.marginTop20 {
+  margin-top: 1.25rem !important; }
+
+.marginTop40 {
+  margin-top: 2.5rem !important; }
+
+.marginTop60 {
+  margin-top: 5rem !important; }
+
+.marginBottom10 {
+  margin-bottom: 0.625rem !important; }
+
+.marginBottom20 {
+  margin-bottom: 1.25rem !important; }
+
+.marginBottom40 {
+  margin-bottom: 2.5rem !important; }
+
+.marginBottom60 {
+  margin-bottom: 5rem !important; }
+
+.paddingTop10 {
+  padding-top: 0.625rem !important; }
+
+.paddingTop20 {
+  padding-top: 1.25rem !important; }
+
+.paddingTop40 {
+  padding-top: 2.5rem !important; }
+
+.paddingTop60 {
+  padding-top: 5rem !important; }
+
+.paddingBottom10 {
+  padding-bottom: 0.625rem !important; }
+
+.paddingBottom20 {
+  padding-bottom: 1.25rem !important; }
+
+.paddingBottom40 {
+  padding-bottom: 2.5rem !important; }
+
+.paddingBottom60 {
+  margin-bottom: 5rem !important; }
+
+.paddingBottom120 {
+  margin-bottom: 10rem !important; }
+
+.paddingTopBottom10 {
+  padding-top: 0.625rem !important;
+  padding-bottom: 0.625rem !important; }
+
+.paddingTopBottom20 {
+  padding-top: 1.25rem !important;
+  padding-bottom: 1.25rem !important; }
+
+.paddingTopBottom40 {
+  padding-top: 2.5rem !important;
+  padding-bottom: 2.5rem !important; }
+
+.paddingTopBottom60 {
+  padding-top: 5rem !important;
+  padding-bottom: 5rem !important; }
+
+.paddingLeftRight10 {
+  padding-left: 0.625rem !important;
+  padding-right: 0.625rem !important; }
+
+.paddingLeftRight20 {
+  padding-left: 1.25rem !important;
+  padding-right: 1.25rem !important; }
