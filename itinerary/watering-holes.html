@@ -10,13 +10,15 @@
         <script src="http://localhost/~jasontaikato/itinerary/js/vendor/modernizr.js"></script>
         <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDcRjvvKaoJuT_-v4op_kWwsV5rwQEIRG8&sensor=true"></script>
     </head>
+<body>
+<div id="mapPreload" class="overlay loading white"></div>
     <div id="swiperHolder" class="swiper-holder">
         <div id="swiperContainer" class="swiper-container">
             <div id="swiperWrapper" class="swiper-wrapper">
-            <div class="swiper-slide white-slide" style="width: 250px;"><a class="toggle-up-down slide-up"></a><div class="title"><h2>Fortune of War</h2><span>Circular Quay</span></div><div class="img-thmb"><img src="http://localhost/~jasontaikato/itinerary/img/itineraries/locations/landscape/sml/fortune-of-war.jpg" alt="" /></div><div class="contentHolder"><p>The Fortune of War dates from 1828 and is Sydney's oldest pub. Embodied in the history of Sydney, the bar was the first and last port of call for generations of sailors and the troops of the Australian Armed Forces who were to experience the 'fortune of the war' when they departed Sydney Cove to defend their country. Whilst retaining its old world charm, the hotel has built an enviable reputation, for providing a warm and traditional service in a cosy, heritage bar.</p></div></div><div class="swiper-slide white-slide" style="width: 250px;"><a class="toggle-up-down slide-up"></a><div class="title"><h2>The Glenmore</h2><span>The Rocks</span></div><div class="img-thmb"><img src="http://localhost/~jasontaikato/itinerary/img/itineraries/locations/landscape/sml/the-glenmore.jpg" alt="" /></div><div class="contentHolder"><p>The Glenmore Hotel was built by Brewers Tooth & Co in 1921 and has been an Aussie icon ever
+            <div class="swiper-slide white-slide"><a class="toggle-up-down slide-up"></a><div class="title"><h2>Fortune of War</h2><span>Circular Quay</span></div><div class="img-thmb"><img src="http://localhost/~jasontaikato/itinerary/img/itineraries/locations/landscape/med/fortune-of-war.jpg" alt="" /></div><div class="contentHolder"><p>The Fortune of War dates from 1828 and is Sydney's oldest pub. Embodied in the history of Sydney, the bar was the first and last port of call for generations of sailors and the troops of the Australian Armed Forces who were to experience the 'fortune of the war' when they departed Sydney Cove to defend their country. Whilst retaining its old world charm, the hotel has built an enviable reputation, for providing a warm and traditional service in a cosy, heritage bar.</p></div></div><div class="swiper-slide white-slide"><a class="toggle-up-down slide-up"></a><div class="title"><h2>The Glenmore</h2><span>The Rocks</span></div><div class="img-thmb"><img src="http://localhost/~jasontaikato/itinerary/img/itineraries/locations/landscape/med/the-glenmore.jpg" alt="" /></div><div class="contentHolder"><p>The Glenmore Hotel was built by Brewers Tooth & Co in 1921 and has been an Aussie icon ever
 since. With its colonial old English charm and character, The Glenmore is a popular watering hole
 and has survived depressions, wars and plagues. The Glenmore is now one of Sydney's premier
-rooftop venues with 180 degree sweeping views of Sydney harbour and the CBD.</p></div></div><div class="swiper-slide white-slide" style="width: 250px;"><a class="toggle-up-down slide-up"></a><div class="title"><h2>The Royal Oak</h2><span>Balmain</span></div><div class="img-thmb"><img src="http://localhost/~jasontaikato/itinerary/img/itineraries/locations/landscape/sml/the-royal-oaks.jpg" alt="" /></div><div class="contentHolder"><p>The Royal Oak is regarded as one of the finest pubs in Balmain. Famous for its food, the Oak prides itself on using fresh, seasonal and ethically sourced ingredients to produce delicious meals of generous portions. Balancing old world charm with modern day design, the Royal Oak is a popular destination for both locals and visitors alike and offers a great range of local and imported beers both on tap and in the bottle.</p></div></div><div class="swiper-slide white-slide" style="width: 250px;"><a class="toggle-up-down slide-up"></a><div class="title"><h2>East Village Hotel</h2><span>Balmain</span></div><div class="img-thmb"><img src="http://localhost/~jasontaikato/itinerary/img/itineraries/locations/landscape/sml/east-village-hotel.jpg" alt="" /></div><div class="contentHolder"><p>The East Village Hotel is a pub with a penchant for craft beer and it's a look that works. The crowd here is made up of families, young professionals and well-dressed Balmain locals who split their time between the shady beer garden, dining room and the front bar. The heavy timber tables and fireplace have an old-fashioned and comforting feel, and anyone will feel welcome at The East Village.</p></div></div>
+rooftop venues with 180 degree sweeping views of Sydney harbour and the CBD.</p></div></div><div class="swiper-slide white-slide"><a class="toggle-up-down slide-up"></a><div class="title"><h2>East Village Hotel</h2><span>Balmain</span></div><div class="img-thmb"><img src="http://localhost/~jasontaikato/itinerary/img/itineraries/locations/landscape/med/east-village-hotel.jpg" alt="" /></div><div class="contentHolder"><p>The East Village Hotel is a pub with a penchant for craft beer and it's a look that works. The crowd here is made up of families, young professionals and well-dressed Balmain locals who split their time between the shady beer garden, dining room and the front bar. The heavy timber tables and fireplace have an old-fashioned and comforting feel, and anyone will feel welcome at The East Village.</p></div></div><div class="swiper-slide white-slide"><a class="toggle-up-down slide-up"></a><div class="title"><h2>The Royal Oak</h2><span>Balmain</span></div><div class="img-thmb"><img src="http://localhost/~jasontaikato/itinerary/img/itineraries/locations/landscape/med/the-royal-oaks.jpg" alt="" /></div><div class="contentHolder"><p>The Royal Oak is regarded as one of the finest pubs in Balmain. Famous for its food, the Oak prides itself on using fresh, seasonal and ethically sourced ingredients to produce delicious meals of generous portions. Balancing old world charm with modern day design, the Royal Oak is a popular destination for both locals and visitors alike and offers a great range of local and imported beers both on tap and in the bottle.</p></div></div>
             </div>
         </div>
     </div>
@@ -33,28 +35,30 @@ rooftop venues with 180 degree sweeping views of Sydney harbour and the CBD.</p>
     {
         var swiperCount = $('.swiper-slide').length;
         var screenWidth = $('body').outerWidth();
-        var newSlideWidth = ((71.875 / 100) * screenWidth);
+        var newSlideWidth = ((78.125 / 100) * screenWidth);
         var newWrapperWidth = newSlideWidth*swiperCount;
-
+        var newWrapperPadding_x = (screenWidth - newSlideWidth);
         var toggleBtnWidth = $('.toggle-up-down').outerWidth();
-
-        console.log('screenWidth['+screenWidth+']');
-        console.log('newSlideWidth['+newSlideWidth+']');
-        console.log('newWrapperWidth['+newWrapperWidth+']');
 
         $('.swiper-slide').css({
             'width': newSlideWidth
-        });
+        })
         $('#swiperWrapper').css({
-            'width': newWrapperWidth
+            'width': newWrapperWidth,
+            'padding-left': newWrapperPadding_x/2,
+            'padding-right': newWrapperPadding_x/2
         });
         $('.toggle-up-down').css({
             'left': (newSlideWidth/2) - (toggleBtnWidth/2)
-        });
+        })
     }
 
+ $(function(){
     $(window).resize(function() {
-        changeSlideDimensions();
+        mySwiper.reInit();
+    });
+    $(window).load(function() {
+        mySwiper.reInit();
     });
 
     var mySwiper = new Swiper('.swiper-container',{
@@ -62,10 +66,13 @@ rooftop venues with 180 degree sweeping views of Sydney harbour and the CBD.</p>
         paginationClickable: true,
         centeredSlides: true,
         slidesPerView: 'auto',
+        resizeReInit: true,
         onSlideChangeEnd: function(swiper) {
             var activeSlide = $('.swiper-slide').eq(swiper.activeIndex);
             var activeLat = latLngArray[swiper.activeIndex].lat;
             var activeLng = latLngArray[swiper.activeIndex].lng;
+            /*var activeLat = activeSlide.attr('data-lat');
+            var activeLng =  activeSlide.attr('data-lng');*/
             var activeLatLng = new google.maps.LatLng(activeLat,activeLng);
             markerArray[swiper.previousIndex].setAnimation(null);
             markerArray[swiper.previousIndex].setIcon('http://localhost/~jasontaikato/itinerary/img/marker-red-hollow.png')
@@ -76,11 +83,9 @@ rooftop venues with 180 degree sweeping views of Sydney harbour and the CBD.</p>
             }, 750);
             map.panTo(activeLatLng);
             map.setZoom(15);
-        },
-        onFirstInit: function() {
-            changeSlideDimensions();
         }
     });
+
 
 
     $(function() {
@@ -94,7 +99,8 @@ rooftop venues with 180 degree sweeping views of Sydney harbour and the CBD.</p>
                 $('#swiperHolder').removeClass('holder-grow').addClass('holder-shrink');
             }
         });
-    })
+    });
+ });
 </script>
 <script>
 
@@ -104,14 +110,14 @@ rooftop venues with 180 degree sweeping views of Sydney harbour and the CBD.</p>
     var marker;
     var markerArray = [];
 
-    var latLngArray = [{lat: -33.86033790,lng: 151.20842680},{lat: -33.85877800,lng: 151.20729400},{lat: -33.85589400,lng: 151.18095200},{lat: -33.85774500,lng: 151.19252900}];
+    var latLngArray = [{lat: -33.86033790,lng: 151.20842680},{lat: -33.85877800,lng: 151.20729400},{lat: -33.85774500,lng: 151.19252900},{lat: -33.85589400,lng: 151.18095200}];
 
     initialize();
 
     function initialize() {
         //console.log('here');
         mapOptions = {
-            center: new google.maps.LatLng(-33.860338,151.208427),
+            center: new google.maps.LatLng(latLngArray[0].lat,latLngArray[0].lng),
             zoom: 15,
             zoomControl: false,
             mapTypeControlOptions: {
@@ -144,6 +150,10 @@ rooftop venues with 180 degree sweeping views of Sydney harbour and the CBD.</p>
                 markerArray.push(marker);
             }(latLngArray[i]));
         }
+
+        google.maps.event.addListener(map, 'tilesloaded', function(evt) {
+            $('#mapPreload').remove();
+        });
     }
 
 

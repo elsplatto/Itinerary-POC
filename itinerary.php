@@ -29,10 +29,10 @@ function getItineraryDetail($id,$DB_SERVER, $DB_USERNAME, $DB_PASSWORD, $DB_DATA
 function getSelectedLocations($id,$DB_SERVER, $DB_USERNAME, $DB_PASSWORD, $DB_DATABASE)
 {
     $mysqli = new mysqli($DB_SERVER, $DB_USERNAME, $DB_PASSWORD, $DB_DATABASE);
-    $stmt = $mysqli->prepare('SELECT il.id, il.title, sub_title, il.image_landscape, il.lat, il.lng, content FROM itinerary_locations il JOIN itinerary_itinerary_location iil ON iil.itinerary_location_id = il.id WHERE iil.itinerary_id = ? ORDER BY iil.sequence');
+    $stmt = $mysqli->prepare('SELECT il.id, il.title, sub_title, il.image_landscape, il.lat, il.lng, il.address, content FROM itinerary_locations il JOIN itinerary_itinerary_location iil ON iil.itinerary_location_id = il.id WHERE iil.itinerary_id = ? ORDER BY iil.sequence');
     $stmt->bind_param('i', $id);
     $stmt->execute();
-    $stmt->bind_result($id, $title, $sub_title, $image_landscape, $lat, $lng, $content);
+    $stmt->bind_result($id, $title, $sub_title, $image_landscape, $lat, $lng, $address, $content);
     $results = array();
     $i = 0;
     while($stmt->fetch())
@@ -43,6 +43,7 @@ function getSelectedLocations($id,$DB_SERVER, $DB_USERNAME, $DB_PASSWORD, $DB_DA
         $results[$i]['image_landscape'] = $image_landscape;
         $results[$i]['lat'] = $lat;
         $results[$i]['lng'] = $lng;
+        $results[$i]['address'] = $address;
         $results[$i]['content'] = $content;
         $i++;
     }
@@ -71,7 +72,8 @@ if (!empty($_GET['id']))
     <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDcRjvvKaoJuT_-v4op_kWwsV5rwQEIRG8&sensor=true"></script>
 </head>
 <body>
-
+<div id="mapPreload" class="overlay loading white"></div>
+<div class="get-position"><a href="#"></a></div>
 <div id="swiperHolder" class="swiper-holder">
     <div id="swiperContainer" class="swiper-container">
         <div id="swiperWrapper" class="swiper-wrapper">
@@ -114,40 +116,59 @@ if (!empty($_GET['id']))
 <script src="js/vendor/swiper/idangerous.swiper-2.1.min.js"></script>
 <script>
 
-    function changeSlideDimensions()
-    {
-        var swiperCount = $('.swiper-slide').length;
-        var screenWidth = $('body').outerWidth();
-        var newSlideWidth = ((78.125 / 100) * screenWidth);
-        var newWrapperWidth = newSlideWidth*swiperCount;
-        var newWrapperPadding_x = (screenWidth - newSlideWidth);
-        var toggleBtnWidth = $('.toggle-up-down').outerWidth();
+function changeSlideDimensions()
+{
+    var swiperCount = $('.swiper-slide').length;
+    var screenWidth = $('body').outerWidth();
+    var newSlideWidth = ((78.125 / 100) * screenWidth);
+    var newWrapperWidth = newSlideWidth*swiperCount;
+    var newWrapperPadding_x = (screenWidth - newSlideWidth);
+    var toggleBtnWidth = $('.toggle-up-down').outerWidth();
 
-        console.log('screenWidth['+screenWidth+']');
-        console.log('newSlideWidth['+newSlideWidth+']');
-        console.log('newWrapperWidth['+newWrapperWidth+']');
+    /*console.log('screenWidth['+screenWidth+']');
+    console.log('newSlideWidth['+newSlideWidth+']');
+    console.log('newWrapperWidth['+newWrapperWidth+']');*/
 
-        $('.swiper-slide').css({
-            'width': newSlideWidth
-        })
-        $('#swiperWrapper').css({
-            'width': newWrapperWidth,
-            'padding-left': newWrapperPadding_x/2,
-            'padding-right': newWrapperPadding_x/2
-        });
-        $('.toggle-up-down').css({
-            'left': (newSlideWidth/2) - (toggleBtnWidth/2)
-        })
-    }
+    $('.swiper-slide').css({
+        'width': newSlideWidth
+    })
+    $('#swiperWrapper').css({
+        'width': newWrapperWidth,
+        'padding-left': newWrapperPadding_x/2,
+        'padding-right': newWrapperPadding_x/2
+    });
+    $('.toggle-up-down').css({
+        'left': (newSlideWidth/2) - (toggleBtnWidth/2)
+    })
+}
 
  $(function(){
     $(window).resize(function() {
-        changeSlideDimensions();
+        mySwiper.reInit();
     });
     $(window).load(function() {
         mySwiper.reInit();
-        //changeSlideDimensions();
     });
+
+    $('.get-position a').click(function(e) {
+        e.preventDefault();
+        if ($(this).hasClass('active'))
+        {
+            $(this).removeClass('active');
+            map.panTo(activeLatLng);
+        }
+        else
+        {
+             $(this).addClass('active');
+             getUserLocation($(this));
+        }
+    });
+
+    var activeIndex = 0;
+    var activeLat = latLngArray[activeIndex].lat;
+    var activeLng = latLngArray[activeIndex].lng;
+    var activeLatLng = new google.maps.LatLng(activeLat,activeLng);;
+    var activeSlide = $('.swiper-slide').eq(activeIndex);;
 
     var mySwiper = new Swiper('.swiper-container',{
         pagination: '.pagination',
@@ -156,21 +177,20 @@ if (!empty($_GET['id']))
         slidesPerView: 'auto',
         resizeReInit: true,
         onSlideChangeEnd: function(swiper) {
-            var activeSlide = $('.swiper-slide').eq(swiper.activeIndex);
-            var activeLat = latLngArray[swiper.activeIndex].lat;
-            var activeLng = latLngArray[swiper.activeIndex].lng;
-            /*var activeLat = activeSlide.attr('data-lat');
-            var activeLng =  activeSlide.attr('data-lng');*/
-            var activeLatLng = new google.maps.LatLng(activeLat,activeLng);
+            activeIndex = swiper.activeIndex;
+            console.log('active Index['+activeIndex+']');
+            activeSlide = $('.swiper-slide').eq(activeIndex);
+            activeLat = latLngArray[activeIndex].lat;
+            activeLng = latLngArray[activeIndex].lng;
+            activeLatLng = new google.maps.LatLng(activeLat,activeLng);
             markerArray[swiper.previousIndex].setAnimation(null);
             markerArray[swiper.previousIndex].setIcon('img/marker-red-hollow.png')
-            markerArray[swiper.activeIndex].setIcon('img/marker-red.png');
-            markerArray[swiper.activeIndex].setAnimation(google.maps.Animation.BOUNCE);
+            markerArray[activeIndex].setIcon('img/marker-red.png');
+            markerArray[activeIndex].setAnimation(google.maps.Animation.BOUNCE);
             setTimeout(function() {
-                markerArray[swiper.activeIndex].setAnimation(null);
+                markerArray[activeIndex].setAnimation(null);
             }, 750);
             map.panTo(activeLatLng);
-            map.setZoom(15);
         }
     });
 
@@ -192,11 +212,17 @@ if (!empty($_GET['id']))
 </script>
 <script>
 
+    var browserGeoLocationSupport = false;
 
+    if(navigator.geolocation) {
+        browserGeoLocationSupport = true;
+    }
 
     var map;
     var marker;
     var markerArray = [];
+    var directionsDisplay;
+    var directionsService = new google.maps.DirectionsService();
 
     <?php
     $i = 0;
@@ -206,7 +232,8 @@ if (!empty($_GET['id']))
     $i++;
         echo '{';
         echo 'lat: '.$selectedLocation['lat'].',';
-        echo 'lng: '.$selectedLocation['lng'];
+        echo 'lng: '.$selectedLocation['lng'].',';
+        echo 'address: "'.$selectedLocation['address'].'"';
         echo '}';
         if ($i < count($selectedLocations))
         {
@@ -219,11 +246,14 @@ if (!empty($_GET['id']))
     initialize();
 
     function initialize() {
-        //console.log('here');
+        directionsDisplay = new google.maps.DirectionsRenderer({
+            suppressMarkers: true,
+            preserveViewport: true
+        });
         mapOptions = {
-            center: new google.maps.LatLng(-33.860338,151.208427),
+            center: new google.maps.LatLng(latLngArray[0].lat,latLngArray[0].lng),
             zoom: 15,
-            zoomControl: false,
+            zoomControl: true,
             mapTypeControlOptions: {
                 style: google.maps.MapTypeControlStyle.DROPDOWN_MENU,
                 position: google.maps.ControlPosition.TOP_CENTER
@@ -231,9 +261,15 @@ if (!empty($_GET['id']))
         };
 
         map = new google.maps.Map(document.getElementById("mapCanvas"),mapOptions);
+        directionsDisplay.setMap(map);
 
-        for (var i=0; i<latLngArray.length; i++)
+        var i = 0;
+
+        calcRoute();
+
+        for (i=0; i<latLngArray.length; i++)
         {
+
             (function(latLngArray){
                 var latLng = new google.maps.LatLng(latLngArray.lat,latLngArray.lng);
                 var icon;
@@ -254,9 +290,80 @@ if (!empty($_GET['id']))
                 markerArray.push(marker);
             }(latLngArray[i]));
         }
+
+        google.maps.event.addListener(map, 'tilesloaded', function(evt) {
+            //$('#mapPreload').remove();
+            $('#mapPreload').hide();
+        });
+
+
+
+        function calcRoute() {
+            var start, end;
+            var waypoints = [];
+            var endpoint = (latLngArray.length - 2);//remember our array is zero-based
+            start = new google.maps.LatLng(latLngArray[0].lat,latLngArray[0].lng);
+            end = new google.maps.LatLng(latLngArray[latLngArray.length - 1].lat,latLngArray[latLngArray.length - 1].lng);
+            for (var i = 1; i < endpoint; i++)
+            {
+                waypoints.push({
+                    location: new google.maps.LatLng(latLngArray[i].lat,latLngArray[i].lng),
+                    stopover: true
+                });
+            }
+
+            var request = {
+                origin: start,
+                destination: end,
+                waypoints: waypoints,
+                optimizeWaypoints: true,
+                travelMode: google.maps.TravelMode.WALKING
+            };
+
+            directionsService.route(request, function(response, status) {
+                console.dir(response);
+                if (status == google.maps.DirectionsStatus.OK) {
+                    directionsDisplay.setDirections(response);
+                }
+            });
+        }
+
+
     }
 
+    function getUserLocation(el) {
+        el.addClass('loading');
+        // Try W3C Geolocation (Preferred)
+        if(navigator.geolocation) {
+            browserGeoLocationSupport = true;
+            navigator.geolocation.getCurrentPosition(function(position) {
+                initialLocation = new google.maps.LatLng(position.coords.latitude,position.coords.longitude);
+                map.setCenter(initialLocation);
+                console.log('accuracy['+position.coords.accuracy+']')
+                el.removeClass('loading');
+            }, function() {
+                handleNoGeolocation(browserGeoLocationSupport);
+                el.removeClass('loading');
+            });
+        }
+        // Browser doesn't support Geolocation
+        else {
+            browserGeoLocationSupport = false;
+            handleNoGeolocation(browserGeoLocationSupport);
+            el.removeClass('loading');
+        }
+    }
 
+    function handleNoGeolocation(errorFlag) {
+        if (errorFlag == true) {
+            alert("Geolocation service failed.");
+            initialLocation = sydney;
+        } else {
+            alert("Your browser doesn't support geolocation. We've placed you in Sydney.");
+            initialLocation = sydney;
+        }
+        map.setCenter(initialLocation);
+    }
 </script>
 </body>
 </html>

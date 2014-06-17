@@ -68,14 +68,14 @@ if (isset($itineraryId))
     $slideHTML = '';
     foreach ($selectedLocations as $selectedLocation)
     {
-        $slideHTML .= '<div class="swiper-slide white-slide" style="width: 250px;">';
+        $slideHTML .= '<div class="swiper-slide white-slide">';
         $slideHTML .= '<a class="toggle-up-down slide-up"></a>';
         $slideHTML .= '<div class="title">';
         $slideHTML .= '<h2>'.$selectedLocation['title'].'</h2>';
         $slideHTML .= '<span>'.$selectedLocation['sub_title'].'</span>';
         $slideHTML .= '</div>';
         $slideHTML .= '<div class="img-thmb">';
-        $slideHTML .= '<img src="'.$baseURL.'img/itineraries/locations/landscape/sml/'.$selectedLocation['image_landscape'].'" alt="" />';
+        $slideHTML .= '<img src="'.$baseURL.'img/itineraries/locations/landscape/med/'.$selectedLocation['image_landscape'].'" alt="" />';
         $slideHTML .= '</div>';
         $slideHTML .= '<div class="contentHolder">';
         $slideHTML .= stripcslashes($selectedLocation['content']);
@@ -145,28 +145,30 @@ $jsScript = <<< EOF
     {
         var swiperCount = $('.swiper-slide').length;
         var screenWidth = $('body').outerWidth();
-        var newSlideWidth = ((71.875 / 100) * screenWidth);
+        var newSlideWidth = ((78.125 / 100) * screenWidth);
         var newWrapperWidth = newSlideWidth*swiperCount;
-
+        var newWrapperPadding_x = (screenWidth - newSlideWidth);
         var toggleBtnWidth = $('.toggle-up-down').outerWidth();
-
-        console.log('screenWidth['+screenWidth+']');
-        console.log('newSlideWidth['+newSlideWidth+']');
-        console.log('newWrapperWidth['+newWrapperWidth+']');
 
         $('.swiper-slide').css({
             'width': newSlideWidth
-        });
+        })
         $('#swiperWrapper').css({
-            'width': newWrapperWidth
+            'width': newWrapperWidth,
+            'padding-left': newWrapperPadding_x/2,
+            'padding-right': newWrapperPadding_x/2
         });
         $('.toggle-up-down').css({
             'left': (newSlideWidth/2) - (toggleBtnWidth/2)
-        });
+        })
     }
 
+ $(function(){
     $(window).resize(function() {
-        changeSlideDimensions();
+        mySwiper.reInit();
+    });
+    $(window).load(function() {
+        mySwiper.reInit();
     });
 
     var mySwiper = new Swiper('.swiper-container',{
@@ -174,10 +176,13 @@ $jsScript = <<< EOF
         paginationClickable: true,
         centeredSlides: true,
         slidesPerView: 'auto',
+        resizeReInit: true,
         onSlideChangeEnd: function(swiper) {
             var activeSlide = $('.swiper-slide').eq(swiper.activeIndex);
             var activeLat = latLngArray[swiper.activeIndex].lat;
             var activeLng = latLngArray[swiper.activeIndex].lng;
+            /*var activeLat = activeSlide.attr('data-lat');
+            var activeLng =  activeSlide.attr('data-lng');*/
             var activeLatLng = new google.maps.LatLng(activeLat,activeLng);
             markerArray[swiper.previousIndex].setAnimation(null);
             markerArray[swiper.previousIndex].setIcon('{$baseURL}img/marker-red-hollow.png')
@@ -188,11 +193,9 @@ $jsScript = <<< EOF
             }, 750);
             map.panTo(activeLatLng);
             map.setZoom(15);
-        },
-        onFirstInit: function() {
-            changeSlideDimensions();
         }
     });
+
 
 
     $(function() {
@@ -206,7 +209,8 @@ $jsScript = <<< EOF
                 $('#swiperHolder').removeClass('holder-grow').addClass('holder-shrink');
             }
         });
-    })
+    });
+ });
 </script>
 <script>
 
@@ -223,7 +227,7 @@ $jsScript = <<< EOF
     function initialize() {
         //console.log('here');
         mapOptions = {
-            center: new google.maps.LatLng(-33.860338,151.208427),
+            center: new google.maps.LatLng(latLngArray[0].lat,latLngArray[0].lng),
             zoom: 15,
             zoomControl: false,
             mapTypeControlOptions: {
@@ -256,6 +260,10 @@ $jsScript = <<< EOF
                 markerArray.push(marker);
             }(latLngArray[i]));
         }
+
+        google.maps.event.addListener(map, 'tilesloaded', function(evt) {
+            $('#mapPreload').remove();
+        });
     }
 
 
@@ -266,6 +274,8 @@ $html = <<< EOF
 <!doctype html>
 <html class="no-js" lang="en">
 {$head}
+<body>
+<div id="mapPreload" class="overlay loading white"></div>
 {$swiper}
 {$mapCanvas}
 {$jsScript}

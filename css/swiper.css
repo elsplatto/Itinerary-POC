@@ -4,6 +4,67 @@
 body {
   font-family: helvetica, arial, sans-serif; }
 
+.overlay {
+  z-index: 20000;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%; }
+  .overlay h3 {
+    font-family: helvetica, arial, sans-serif;
+    size: 1rem;
+    font-weight: 400;
+    position: absolute;
+    top: 40%;
+    left: 50%; }
+
+.overlay.grey {
+  background-color: rgba(51, 51, 51, 0.75); }
+
+.overlay.white {
+  background-color: white; }
+
+.overlay.loading {
+  background-image: url("img/preloader-2.gif");
+  background-repeat: no-repeat;
+  background-position: center center; }
+
+.get-position {
+  display: block;
+  z-index: 100;
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 33px;
+  height: 33px; }
+  .get-position a {
+    display: block;
+    width: inherit;
+    height: inherit;
+    position: relative;
+    background-color: white;
+    border: 1px solid #333333;
+    border-radius: 49%; }
+    .get-position a:before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 33px;
+      height: 33px;
+      background-image: url("img/sprite.png");
+      background-position: -22px 0; }
+  .get-position .active {
+    background-color: #1b8ee6; }
+  .get-position .loading {
+    border: 1px solid white;
+    border-radius: 49%;
+    background-color: transparent;
+    background-image: url("img/preloader-2-sml.gif"); }
+    .get-position .loading:before {
+      background-image: none !important; }
+
 .swiper-holder {
   width: 100%;
   height: 38%;
@@ -69,6 +130,7 @@ body {
   -ms-touch-action: pan-x; }
 
 .swiper-slide {
+  max-width: 620px;
   width: 70vw;
   height: 100%;
   opacity: 0.4;
@@ -85,9 +147,9 @@ body {
   .swiper-slide .img-thmb {
     margin: 0 auto; }
     .swiper-slide .img-thmb img {
-      max-width: 100%;
-      width: auto;
-      height: auto; }
+      max-width: 620px;
+      width: 70vw;
+      height: inherit; }
 
 .swiper-slide-visible {
   opacity: 0.5;
@@ -222,10 +284,13 @@ body {
 .contentHolder {
   height: 43%;
   width: inherit;
+  max-width: inherit;
   overflow: scroll;
   -webkit-overflow-scrolling: touch; }
   .contentHolder p {
-    width: inherit; }
+    max-width: inherit;
+    width: inherit;
+    padding: 0 1rem; }
 
 /* ===============================================================
  *Your custom styles, here you need to specify container's and slide's
