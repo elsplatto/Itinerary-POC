@@ -262,6 +262,8 @@ if (isset($itineraryId))
     fclose($file);
 
     include 'template-builder.php';
+
+    include 'manifest-builder.php';
 }
 else
 {

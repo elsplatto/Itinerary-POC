@@ -1,0 +1,26 @@
+CACHE MANIFEST
+# 2014-06-19 15:40:18
+#static files
+CACHE:
+/~jasontaikato/itinerary/itinerary/watering-holes.html
+/~jasontaikato/itinerary/css/idangerous.swiper.css
+/~jasontaikato/itinerary/css/swiper.css
+/~jasontaikato/itinerary/css/style.css
+/~jasontaikato/itinerary/css/img/sprite.png
+/~jasontaikato/itinerary/css/img/preloader-2.gif
+/~jasontaikato/itinerary/css/img/preloader-2-sml.gif
+/~jasontaikato/itinerary/js/vendor/jquery.js
+/~jasontaikato/itinerary/js/vendor/modernizr.js
+/~jasontaikato/itinerary/js/vendor/swiper/idangerous.swiper-2.1.min.js
+/~jasontaikato/itinerary/img/marker-orange-hollow.png
+/~jasontaikato/itinerary/img/marker-orange.png
+/~jasontaikato/itinerary/img/location-dot.png
+#dynamic files
+/~jasontaikato/itinerary/img/itineraries/locations/landscape/med/fortune-of-war.jpg
+/~jasontaikato/itinerary/img/itineraries/locations/landscape/med/the-glenmore.jpg
+/~jasontaikato/itinerary/img/itineraries/locations/landscape/med/east-village-hotel.jpg
+/~jasontaikato/itinerary/img/itineraries/locations/landscape/med/the-royal-oaks.jpg
+
+
+NETWORK:
+*

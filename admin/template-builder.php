@@ -1,61 +1,7 @@
 <?php
 //include '../includes/db.php';
 
-
-function getItineraryDetail($id,$DB_SERVER, $DB_USERNAME, $DB_PASSWORD, $DB_DATABASE)
-{
-    $mysqli = new mysqli($DB_SERVER, $DB_USERNAME, $DB_PASSWORD, $DB_DATABASE);
-    $stmt = $mysqli->prepare('SELECT title, page_name, sub_title, intro_text, description, image_landscape, image_portrait, date_created, date_last_modified, json_filename FROM itinerary WHERE id = ?');
-    $stmt->bind_param('i', $id);
-    $stmt->execute();
-    $stmt->bind_result($title, $page_name, $sub_title, $intro_text, $description, $image_landscape, $image_portrait, $date_created, $date_last_modified, $json_filename);
-
-    $results = array();
-    while($stmt->fetch())
-    {
-        $results['title'] = $title;
-        $results['page_name'] = $page_name;
-        $results['sub_title'] = $sub_title;
-        $results['intro_text'] = $intro_text;
-        $results['description'] = $description;
-        $results['image_landscape'] = $image_landscape;
-        $results['image_portrait'] = $image_portrait;
-
-        $results['date_created'] = $date_created;
-        $results['date_last_modified'] = $date_last_modified;
-        $results['json_filename'] = $json_filename;
-    }
-
-    $stmt->close();
-    $mysqli->close();
-    return $results;
-}
-
-function getSelectedLocations($id,$DB_SERVER, $DB_USERNAME, $DB_PASSWORD, $DB_DATABASE)
-{
-    $mysqli = new mysqli($DB_SERVER, $DB_USERNAME, $DB_PASSWORD, $DB_DATABASE);
-    $stmt = $mysqli->prepare('SELECT il.id, il.title, sub_title, il.image_landscape, il.lat, il.lng, content FROM itinerary_locations il JOIN itinerary_itinerary_location iil ON iil.itinerary_location_id = il.id WHERE iil.itinerary_id = ? ORDER BY iil.sequence');
-    $stmt->bind_param('i', $id);
-    $stmt->execute();
-    $stmt->bind_result($id, $title, $sub_title, $image_landscape, $lat, $lng, $content);
-    $results = array();
-    $i = 0;
-    while($stmt->fetch())
-    {
-        $results[$i]['id'] = $id;
-        $results[$i]['title'] = $title;
-        $results[$i]['sub_title'] = $sub_title;
-        $results[$i]['image_landscape'] = $image_landscape;
-        $results[$i]['lat'] = $lat;
-        $results[$i]['lng'] = $lng;
-        $results[$i]['content'] = $content;
-        $i++;
-    }
-    $stmt->close();
-    $mysqli->close();
-    return $results;
-}
-
+$filePrePath = '../';
 
 
 if (isset($itineraryId))
@@ -64,6 +10,20 @@ if (isset($itineraryId))
     $selectedLocations = getSelectedLocations($itineraryId,$DB_SERVER, $DB_USERNAME, $DB_PASSWORD, $DB_DATABASE);
 
     $filename = $itineraryDetail['page_name'].'.html';
+
+
+
+    if (is_null($itineraryDetail['date_last_modified']) || empty($itineraryDetail['date_last_modified']))
+    {
+        $latestDate = $itineraryDetail['date_created'];
+    }
+    else
+    {
+        $latestDate = $itineraryDetail['date_last_modified'];
+    }
+
+    $manifestFilename = 'itinerary-'.$itineraryId.'-'.$latestDate.'.manifest';
+
 
     $slideHTML = '';
     foreach ($selectedLocations as $selectedLocation)
@@ -75,7 +35,7 @@ if (isset($itineraryId))
         $slideHTML .= '<span>'.$selectedLocation['sub_title'].'</span>';
         $slideHTML .= '</div>';
         $slideHTML .= '<div class="img-thmb">';
-        $slideHTML .= '<img src="'.$baseURL.'img/itineraries/locations/landscape/med/'.$selectedLocation['image_landscape'].'" alt="" />';
+        $slideHTML .= '<img src="'.$filePrePath.'img/itineraries/locations/landscape/med/'.$selectedLocation['image_landscape'].'" alt="" />';
         $slideHTML .= '</div>';
         $slideHTML .= '<div class="contentHolder">';
         $slideHTML .= stripcslashes($selectedLocation['content']);
@@ -106,12 +66,12 @@ if (isset($itineraryId))
 $head = <<< EOF
     <head>
         <meta charset="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0" />
         <title>Itinerary - {$itineraryDetail['title']}</title>
-        <link rel="stylesheet" href="{$baseURL}css/idangerous.swiper.css" />
-        <link rel="stylesheet" href="{$baseURL}css/style.css" />
-        <link rel="stylesheet" href="{$baseURL}css/swiper.css" />
-        <script src="{$baseURL}js/vendor/modernizr.js"></script>
+        <link rel="stylesheet" href="{$filePrePath}css/idangerous.swiper.css" />
+        <link rel="stylesheet" href="{$filePrePath}css/style.css" />
+        <link rel="stylesheet" href="{$filePrePath}css/swiper.css" />
+        <script src="{$filePrePath}js/vendor/modernizr.js"></script>
         <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDcRjvvKaoJuT_-v4op_kWwsV5rwQEIRG8&sensor=true"></script>
     </head>
 EOF;
@@ -137,31 +97,10 @@ EOF;
 
 
 $jsScript = <<< EOF
-<script src="{$baseURL}js/vendor/jquery.js"></script>
-<script src="{$baseURL}js/vendor/swiper/idangerous.swiper-2.1.min.js"></script>
+<script src="{$filePrePath}js/vendor/jquery.js"></script>
+<script src="{$filePrePath}js/vendor/swiper/idangerous.swiper-2.1.min.js"></script>
 <script>
 
-    function changeSlideDimensions()
-    {
-        var swiperCount = $('.swiper-slide').length;
-        var screenWidth = $('body').outerWidth();
-        var newSlideWidth = ((78.125 / 100) * screenWidth);
-        var newWrapperWidth = newSlideWidth*swiperCount;
-        var newWrapperPadding_x = (screenWidth - newSlideWidth);
-        var toggleBtnWidth = $('.toggle-up-down').outerWidth();
-
-        $('.swiper-slide').css({
-            'width': newSlideWidth
-        })
-        $('#swiperWrapper').css({
-            'width': newWrapperWidth,
-            'padding-left': newWrapperPadding_x/2,
-            'padding-right': newWrapperPadding_x/2
-        });
-        $('.toggle-up-down').css({
-            'left': (newSlideWidth/2) - (toggleBtnWidth/2)
-        })
-    }
 
  $(function(){
     $(window).resize(function() {
@@ -171,6 +110,31 @@ $jsScript = <<< EOF
         mySwiper.reInit();
     });
 
+    $('.get-position a').click(function(e) {
+        e.preventDefault();
+        if ($(this).hasClass('active') && markerInBounds(userLocationMarker))
+        {
+            $(this).removeClass('active');
+            map.panTo(activeLatLng);
+            if (!$.isEmptyObject(userLocationMarker))
+            {
+                //remove user location marker and accuracy circle - empty out objects
+                userLocationMarker.setMap(null);
+            }
+        }
+        else
+        {
+             $(this).addClass('active');
+             getUserLocation($(this));
+        }
+    });
+
+    var activeIndex = 0;
+    var activeLat = latLngArray[activeIndex].lat;
+    var activeLng = latLngArray[activeIndex].lng;
+    var activeLatLng = new google.maps.LatLng(activeLat,activeLng);
+    var activeSlide = $('.swiper-slide').eq(activeIndex);
+
     var mySwiper = new Swiper('.swiper-container',{
         pagination: '.pagination',
         paginationClickable: true,
@@ -178,25 +142,21 @@ $jsScript = <<< EOF
         slidesPerView: 'auto',
         resizeReInit: true,
         onSlideChangeEnd: function(swiper) {
-            var activeSlide = $('.swiper-slide').eq(swiper.activeIndex);
-            var activeLat = latLngArray[swiper.activeIndex].lat;
-            var activeLng = latLngArray[swiper.activeIndex].lng;
-            /*var activeLat = activeSlide.attr('data-lat');
-            var activeLng =  activeSlide.attr('data-lng');*/
-            var activeLatLng = new google.maps.LatLng(activeLat,activeLng);
+            activeIndex = swiper.activeIndex;
+            activeSlide = $('.swiper-slide').eq(activeIndex);
+            activeLat = latLngArray[activeIndex].lat;
+            activeLng = latLngArray[activeIndex].lng;
+            activeLatLng = new google.maps.LatLng(activeLat,activeLng);
             markerArray[swiper.previousIndex].setAnimation(null);
-            markerArray[swiper.previousIndex].setIcon('{$baseURL}img/marker-red-hollow.png')
-            markerArray[swiper.activeIndex].setIcon('{$baseURL}img/marker-red.png');
-            markerArray[swiper.activeIndex].setAnimation(google.maps.Animation.BOUNCE);
+            markerArray[swiper.previousIndex].setIcon('{$filePrePath}img/marker-orange-hollow.png')
+            markerArray[activeIndex].setIcon('{$filePrePath}img/marker-orange.png');
+            markerArray[activeIndex].setAnimation(google.maps.Animation.BOUNCE);
             setTimeout(function() {
-                markerArray[swiper.activeIndex].setAnimation(null);
+                markerArray[activeIndex].setAnimation(null);
             }, 750);
             map.panTo(activeLatLng);
-            map.setZoom(15);
         }
     });
-
-
 
     $(function() {
         $('body').on('click', '.toggle-up-down', function() {
@@ -216,16 +176,40 @@ $jsScript = <<< EOF
 
 
 
+    var browserGeoLocationSupport = false;
+    var userLocationMarker = {};
+    var userLocationAccuracyCircle = {};
+
+    if(navigator.geolocation) {
+        browserGeoLocationSupport = true;
+    }
+
     var map;
     var marker;
     var markerArray = [];
+    var directionsDisplay;
+    var directionsService = new google.maps.DirectionsService();
+
+    var polylineOptionsActual = new google.maps.Polyline({
+        strokeColor: '#6eb240',
+        strokeOpacity: 1.0,
+        strokeWeight: 3
+    });
 
     {$scriptString}
 
     initialize();
 
     function initialize() {
-        //console.log('here');
+        directionsDisplay = new google.maps.DirectionsRenderer({
+            polylineOptions: {
+                strokeColor: '#6eb240',
+                strokeOpacity: 1.0,
+                strokeWeight: 3
+            },
+            suppressMarkers: true,
+            preserveViewport: true
+        });
         mapOptions = {
             center: new google.maps.LatLng(latLngArray[0].lat,latLngArray[0].lng),
             zoom: 15,
@@ -237,19 +221,134 @@ $jsScript = <<< EOF
         };
 
         map = new google.maps.Map(document.getElementById("mapCanvas"),mapOptions);
+        directionsDisplay.setMap(map);
 
-        for (var i=0; i<latLngArray.length; i++)
+        var styles = [
+            {
+                "featureType": "transit.line",
+                "elementType": "geometry.fill",
+                "stylers": [
+                    {"visibility": "off" }
+                ]
+            },
+            {
+                "featureType":"water",
+                "stylers": [
+                    {"visibility":"on"},
+                    {"color":"#acbcc9"}
+                ]
+            },
+            {
+                "featureType":"landscape",
+                "stylers":[
+                    {"color":"#f2e5d4"}
+                ]
+            },
+            {
+                "featureType":"road.highway",
+                "elementType":"geometry",
+                "stylers": [
+                    {"color":"#c5c6c6"}
+                ]
+            },
+            {
+                "featureType":"road.arterial",
+                "elementType":"geometry",
+                "stylers": [
+                    {"color":"#e4d7c6"}
+                ]
+            },
+            {
+                "featureType":"road.local",
+                "elementType":"geometry",
+                "stylers": [
+                    {
+                        "color":"#fbfaf7"
+                    }
+                ]
+            },
+            {
+                "featureType":"poi.park",
+                "elementType":"geometry",
+                "stylers": [
+                    {
+                        "visibility":"off"
+                    },
+                    {
+                        "color":"#c5dac6"
+                    }
+                ]
+            },
+            {
+                "featureType":"administrative",
+                "stylers": [
+                    {
+                        "visibility":"off"
+                    },
+                    {
+                        "lightness":33
+                    }
+                ]
+            },
+            {
+                "featureType":"road"
+            },
+            {
+                "featureType":"poi.park",
+                "elementType":"labels",
+                "stylers": [
+                    {
+                        "visibility":"off"
+                    },
+                    {
+                        "lightness":20
+                    }
+                ]
+            },
+            {
+                "featureType":"poi.business",
+                "elementType":"labels",
+                "stylers": [
+                    {
+                        "lightness":20
+                    }
+                ]
+            },
+            {
+
+            },
+            {
+                "featureType":"road",
+                "stylers": [
+                    {
+                        "lightness":20
+                    }
+                ]
+            }
+        ]
+
+
+        var styledMap = new google.maps.StyledMapType(styles, {name: "Map"});
+
+        map.mapTypes.set('map_style', styledMap);
+        map.setMapTypeId('map_style');
+
+        var i = 0;
+
+        calcRoute();
+
+        for (i=0; i<latLngArray.length; i++)
         {
             (function(latLngArray){
                 var latLng = new google.maps.LatLng(latLngArray.lat,latLngArray.lng);
                 var icon;
                 if (i === 0)
                 {
-                    icon = '{$baseURL}img/marker-red.png';
+                    icon = '{$filePrePath}img/marker-orange.png';
                 }
                 else
                 {
-                    icon = '{$baseURL}img/marker-red-hollow.png';
+                    icon = '{$filePrePath}img/marker-orange-hollow.png';
                 }
 
                 marker = new google.maps.Marker({
@@ -262,8 +361,98 @@ $jsScript = <<< EOF
         }
 
         google.maps.event.addListener(map, 'tilesloaded', function(evt) {
-            $('#mapPreload').remove();
+            //$('#mapPreload').remove();
+            $('#mapPreload').hide();
         });
+
+        function calcRoute() {
+            var start, end;
+            var waypoints = [];
+            var endpoint = (latLngArray.length - 2);//remember our array is zero-based
+            start = new google.maps.LatLng(latLngArray[0].lat,latLngArray[0].lng);
+            end = new google.maps.LatLng(latLngArray[latLngArray.length - 1].lat,latLngArray[latLngArray.length - 1].lng);
+            for (var i = 1; i < endpoint; i++)
+            {
+                waypoints.push({
+                    location: new google.maps.LatLng(latLngArray[i].lat,latLngArray[i].lng),
+                    stopover: true
+                });
+            }
+
+            var request = {
+                origin: start,
+                destination: end,
+                waypoints: waypoints,
+                optimizeWaypoints: true,
+                travelMode: google.maps.TravelMode.WALKING
+            };
+
+            directionsService.route(request, function(response, status) {
+                if (status == google.maps.DirectionsStatus.OK) {
+                    directionsDisplay.setDirections(response);
+                }
+            });
+        }
+    }
+
+    function getUserLocation(el) {
+        el.addClass('loading');
+        // Try W3C Geolocation (Preferred)
+        if (!$.isEmptyObject(userLocationMarker))
+        {
+            //remove user location marker and accuracy circle - empty out objects
+            userLocationMarker.setMap(null);
+            userLocationAccuracyCircle.setMap(null);
+            userLocationMarker = {};
+            userLocationAccuracyCircle = {};
+        }
+        if(browserGeoLocationSupport) {
+            navigator.geolocation.getCurrentPosition(function(position) {
+                initialLocation = new google.maps.LatLng(position.coords.latitude,position.coords.longitude);
+                accuracy = position.coords.accuracy;
+                userLocationMarker = new google.maps.Marker({
+                    position: initialLocation,
+                    map: map,
+                    icon: '{$filePrePath}img/location-dot.png'
+                });
+                userLocationAccuracyCircle = new google.maps.Circle({
+                    center: initialLocation,
+                    radius: accuracy,
+                    map: map,
+                    fillColor: '#0000ff',
+                    fillOpacity: 0.1,
+                    strokeColor: '#0000ff',
+                    strokeOpacity: 0.25,
+                    strokeWeight: 1
+                });
+                map.setCenter(initialLocation);
+                map.fitBounds(userLocationAccuracyCircle.getBounds());
+                el.removeClass('loading');
+            }, function() {
+                handleNoGeolocation(browserGeoLocationSupport);
+                el.removeClass('loading');
+            });
+        }
+        // Browser doesn't support Geolocation
+        else {
+            handleNoGeolocation(browserGeoLocationSupport);
+            el.removeClass('loading');
+        }
+    }
+
+    function handleNoGeolocation(errorFlag) {
+        if (errorFlag == true) {
+            alert("Geolocation service failed.");
+            initialLocation = sydney;
+        } else {
+            alert("Your browser doesn't support geolocation. We've placed you in Sydney.");
+            initialLocation = sydney;
+        }
+        map.setCenter(initialLocation);
+    }
+
+    function markerInBounds(marker){
+        return map.getBounds().contains(marker.getPosition());
     }
 
 
@@ -272,10 +461,11 @@ EOF;
 
 $html = <<< EOF
 <!doctype html>
-<html class="no-js" lang="en">
+<html manifest="{$filePrePath}manifests/{$manifestFilename}" class="no-js" lang="en">
 {$head}
 <body>
 <div id="mapPreload" class="overlay loading white"></div>
+<div class="get-position"><a href="#"></a></div>
 {$swiper}
 {$mapCanvas}
 {$jsScript}

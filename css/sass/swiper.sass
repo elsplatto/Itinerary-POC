@@ -60,7 +60,11 @@ body
       background-image: url('img/sprite.png')
       background-position: -22px 0
   .active
-    background-color: #1b8ee6
+    border: 1px solid #fff
+    border-radius: 49%
+    background-color: #6eb240
+    &:before
+      background-position: -55px 0
   .loading
     border: 1px solid #fff
     border-radius: 49%
@@ -69,6 +73,9 @@ body
     &:before
       background-image: none !important
 
+.map-large
+  img
+    max-width: inherit
 
 .swiper-holder
   width: 100%
@@ -138,7 +145,7 @@ body
 
 .swiper-slide
   max-width: 620px
-  width: 70vw
+  width: 85vw
   height: 100%
   opacity: 0.4
   -webkit-transition: 300ms
@@ -157,7 +164,7 @@ body
     //height: 130px
     img
       max-width: 620px
-      width: 70vw
+      width: 85vw
       height: inherit
 
 
@@ -253,6 +260,7 @@ body
     margin: 0
     padding: 0
     font-size: 20px
+    font-weight: 400
     line-height: 25px
   span
     font-size: 12px
