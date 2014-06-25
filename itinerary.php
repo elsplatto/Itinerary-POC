@@ -64,6 +64,7 @@ if (!empty($_GET['id']))
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0" />
+    <meta name="apple-mobile-web-app-capable" content="yes">
     <title>Itinerary - <?=$itineraryDetail['title']?></title>
     <link rel="stylesheet" href="css/idangerous.swiper.css" />
     <link rel="stylesheet" href="css/style.css" />
@@ -78,23 +79,26 @@ if (!empty($_GET['id']))
     <div id="swiperContainer" class="swiper-container">
         <div id="swiperWrapper" class="swiper-wrapper">
             <?php
+            $j = 0;
             foreach ($selectedLocations as $selectedLocation)
             {
             ?>
             <div class="swiper-slide white-slide">
-                <a class="toggle-up-down slide-up"></a>
-                <div class="title">
+                <!--a class="toggle-up-down slide-up"></a-->
+                <div class="title" id="title-<?=$j?>">
                     <h2><?=$selectedLocation['title']?></h2>
-                    <span><?=$selectedLocation['sub_title']?></span>
+                    <!--span><?=$selectedLocation['sub_title']?></span-->
                 </div>
-                <div class="img-thmb">
+                <!--div class="img-thmb">
                     <img src="img/itineraries/locations/landscape/med/<?=$selectedLocation['image_landscape']?>" alt="" />
-                </div>
+                </div-->
                 <div class="contentHolder">
+                    <img src="img/itineraries/locations/landscape/med/<?=$selectedLocation['image_landscape']?>" alt="" />
                     <?=stripcslashes($selectedLocation['content'])?>
                 </div>
             </div>
             <?php
+                $j++;
             }
             ?>
         </div>
@@ -110,31 +114,195 @@ if (!empty($_GET['id']))
 </div>
 
 
-
 <script src="js/vendor/jquery.js"></script>
+<script src="js/vendor/jquery.touchSwipe.min.js"></script>
 <script src="js/vendor/swiper/idangerous.swiper-2.1.min.js"></script>
 <script>
 
  $(function(){
 
-    <?php
-    $i = 0;
-    echo 'var latLngArray = [';
-    foreach ($selectedLocations as $selectedLocation)
+     var dragStartTime = 0;
+     var dragStartY = 0;
+     var dragHolderDiff = 0;
+     var originalDistanceFromBottom = 0;
+     var holderHeight = $('#swiperHolder').outerHeight();
+     var screenHeight = $(document).height();
+     var distanceFromBottom = 0;
+     var upperThreshold = (80 / 100) * screenHeight;
+     var lowerThreshold = $('.title').outerHeight() + 40;
+     var swipeDirection = '';
+     var distanceCovered = 0;
+
+     //console.log('title height: ' + $('.title').outerHeight())
+
+    $('body').on('mousedown touchstart', '.title', function(e)
     {
-        $i++;
-        echo '{';
-        echo 'lat: '.$selectedLocation['lat'].',';
-        echo 'lng: '.$selectedLocation['lng'].',';
-        echo 'address: "'.$selectedLocation['address'].'"';
-        echo '}';
-        if ($i < count($selectedLocations))
+        e.stopPropagation();
+        holderHeight = $('#swiperHolder').outerHeight();
+        dragStartTime = e.timeStamp;
+        dragStartY = e.originalEvent.pageY;
+        distanceFromBottom = (screenHeight - dragStartY);
+        dragHolderDiff = (holderHeight - distanceFromBottom);
+        originalDistanceFromBottom = distanceFromBottom;
+        console.dir(e)
+        if (e.type === 'mousedown')
         {
-           echo ',';
+            console.log('touch start: ' + distanceFromBottom);
+            console.log('touch start holder height: ' + holderHeight);
         }
-    }
-    echo '];';
-    ?>
+    }).on('mousemove touchmove', '.title', function(e){
+        e.stopPropagation();
+        e.preventDefault();
+        var touch = e.originalEvent.touches[0] || e.originalEvent.changedTouches[0];
+        holderHeight = $('#swiperHolder').outerHeight();
+        distanceFromBottom = (screenHeight - touch.pageY);
+        //console.log('touch move: ' + distanceFromBottom);
+        if (dragStartY > 0 && ((distanceFromBottom + dragHolderDiff) < upperThreshold) && ((distanceFromBottom + dragHolderDiff) > lowerThreshold))
+        {
+            $('#swiperHolder').css({
+                height: ((screenHeight - touch.pageY) + dragHolderDiff)
+            })
+        }
+        //asses direction
+        if (originalDistanceFromBottom < distanceFromBottom)
+        {
+            swipeDirection = 'up';
+        }
+        else if (originalDistanceFromBottom > distanceFromBottom)
+        {
+            swipeDirection = 'down';
+        }
+    }).on('touchend', '.title', function(e){
+
+        var timeSpan = (e.timeStamp - dragStartTime);
+        var touch = e.originalEvent.touches[0] || e.originalEvent.changedTouches[0];
+        distanceFromBottom = (screenHeight - touch.pageY);
+        console.log('touch end: ' + distanceFromBottom);
+        console.log('touch end holder height: ' + holderHeight);
+        /*if (swipeDirection === 'up')
+        {
+            distanceCovered = (distanceFromBottom - originalDistanceFromBottom);
+        }
+        else if (swipeDirection === 'down')
+        {
+            distanceCovered = (originalDistanceFromBottom - distanceFromBottom);
+        }*/
+        distanceCovered = (distanceFromBottom - originalDistanceFromBottom);
+        console.log('distance covered: ' + distanceCovered)
+        /*if ((upperThreshold - $('#swiperHolder').outerHeight()) < 10)
+        {
+            slidesUp();
+        }
+        else if (($('#swiperHolder').outerHeight() - lowerThreshold) < 10)
+        {
+            slidesDown();
+        }
+        else
+        {
+            slidesMiddled();
+        }*/
+
+        var velocity = (distanceCovered/timeSpan);
+        var rollingDistance = 0;
+
+        /*if (velocity > 0.3)
+        {
+            if (swipeDirection === 'up' )
+            {
+                if ($('#swiperHolder').outerHeight() < upperThreshold)
+                {
+                    if ((($('#swiperHolder').outerHeight() + distanceCovered) + dragHolderDiff) < (upperThreshold - $('#swiperHolder').outerHeight()))
+                    {
+                        rollingDistance = distanceCovered;
+                    }
+                    else
+                    {
+                        rollingDistance = (upperThreshold - $('#swiperHolder').outerHeight());
+                    }
+
+                    $('#swiperHolder').animate({
+                        height: $('#swiperHolder').outerHeight() + rollingDistance
+                    }, timeSpan, function() {
+                        if ($('#swiperHolder').outerHeight() > upperThreshold)
+                        {
+                            $('#swiperHolder').css({
+                                height: upperThreshold
+                            })
+                        }
+                    });
+                }
+            }
+            else if (swipeDirection === 'down' )
+            {
+                //console.log('(holder height - distance covered) + drag holder diff: ' + (($('#swiperHolder').outerHeight() - distanceCovered) + dragHolderDiff));
+                //console.log('holder height - lower threshold' + ($('#swiperHolder').outerHeight() - lowerThreshold))
+                if ($('#swiperHolder').outerHeight() > lowerThreshold)
+                {
+                    if ((($('#swiperHolder').outerHeight() - distanceCovered) + dragHolderDiff) > ($('#swiperHolder').outerHeight() - lowerThreshold))
+                    {
+
+                        rollingDistance = (lowerThreshold - $('#swiperHolder').outerHeight());
+                    }
+                    else
+                    {
+                        rollingDistance = distanceCovered + dragHolderDiff;
+                    }
+
+                    $('#swiperHolder').animate({
+                        height: $('#swiperHolder').outerHeight() + rollingDistance
+                    }, timeSpan, function() {
+                        assessThresholds();
+                    });
+                }
+            }
+        }*/
+
+
+        //console.log('height: ' + $('#swiperHolder').outerHeight());
+        //console.log('upper threshold: ' + upperThreshold);
+    });
+
+
+     function assessThresholds() {
+         if ($('#swiperHolder').outerHeight() > upperThreshold)
+         {
+             $('#swiperHolder').css({
+                 height: upperThreshold
+             })
+             slidesUp();
+         }
+         else if ($('#swiperHolder').outerHeight() < lowerThreshold)
+         {
+             $('#swiperHolder').css({
+                 height: lowerThreshold
+             });
+             slidesDown();
+         }
+         else
+         {
+             slidesMiddled();
+         }
+
+     }
+
+     <?php
+     $i = 0;
+     echo 'var latLngArray = [';
+     foreach ($selectedLocations as $selectedLocation)
+     {
+         $i++;
+         echo '{';
+         echo 'lat: '.$selectedLocation['lat'].',';
+         echo 'lng: '.$selectedLocation['lng'].',';
+         echo 'address: "'.$selectedLocation['address'].'"';
+         echo '}';
+         if ($i < count($selectedLocations))
+         {
+            echo ',';
+         }
+     }
+     echo '];';
+     ?>
 
     var activeIndex = 0;
     var activeLat = latLngArray[activeIndex].lat;
@@ -143,7 +311,7 @@ if (!empty($_GET['id']))
     var activeSlide = $('.swiper-slide').eq(activeIndex);
     var slideMode = 'down';
 
-    var mySwiper = new Swiper('.swiper-container',
+    var mainSwiper = new Swiper('.swiper-container',
     {
         pagination: '.pagination',
         paginationClickable: true,
@@ -176,7 +344,6 @@ if (!empty($_GET['id']))
     });
 
 
-
     $('.get-position a').click(function(e) {
         e.preventDefault();
         if ($(this).hasClass('active') && markerInBounds(userLocationMarker))
@@ -203,22 +370,39 @@ if (!empty($_GET['id']))
         }
     });
 
-    $('body').on('click', '.toggle-up-down', function() {
+    /*$('body').on('click', '.toggle-up-down', function() {
         if ($(this).hasClass('slide-up'))
         {
-            $('.toggle-up-down').removeClass('slide-up').addClass('slide-down');
-            $('#swiperHolder').removeClass('holder-shrink').addClass('holder-grow');
-            slideMode = 'up';
-            mapRecenterTop(activeLatLng);
+            slidesUp();
         } else if ($(this).hasClass('slide-down'))
         {
-            $('.toggle-up-down').removeClass('slide-down').addClass('slide-up');
-            $('#swiperHolder').removeClass('holder-grow').addClass('holder-shrink');
-            slideMode = 'down';
-            map.setCenter(activeLatLng);
+            slidesDown();
         }
-    });
+    });*/
 
+    function slidesUp()
+    {
+        $('.title').removeClass('up');
+        $('.title').addClass('down');
+        slideMode = 'up';
+        mapRecenterTop(activeLatLng);
+    }
+
+    function slidesDown()
+    {
+        $('.title').removeClass('down');
+        $('.title').addClass('up');
+        slideMode = 'down';
+        map.setCenter(activeLatLng);
+    }
+
+     function slidesMiddled()
+     {
+         $('.title').removeClass('down');
+         $('.title').removeClass('up');
+         slideMode = 'down';
+         map.setCenter(activeLatLng);
+     }
 
     var browserGeoLocationSupport = false;
     var userLocationMarker = {};
@@ -405,7 +589,7 @@ if (!empty($_GET['id']))
 
                 google.maps.event.addListener(marker, 'click', function(){
                     //putting true in callback parameter allows icon change and animations to execute at emd of slide animation
-                    mySwiper.swipeTo(marker.index, 300,true);
+                    mainSwiper.swipeTo(marker.index, 300,true);
                 });
 
             }(latLngArray[i]));
