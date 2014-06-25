@@ -29,15 +29,15 @@ if (isset($itineraryId))
     foreach ($selectedLocations as $selectedLocation)
     {
         $slideHTML .= '<div class="swiper-slide white-slide">';
-        $slideHTML .= '<a class="toggle-up-down slide-up"></a>';
+        //$slideHTML .= '<a class="toggle-up-down slide-up"></a>';
         $slideHTML .= '<div class="title">';
         $slideHTML .= '<h2>'.$selectedLocation['title'].'</h2>';
-        $slideHTML .= '<span>'.$selectedLocation['sub_title'].'</span>';
+        //$slideHTML .= '<span>'.$selectedLocation['sub_title'].'</span>';
         $slideHTML .= '</div>';
-        $slideHTML .= '<div class="img-thmb">';
-        $slideHTML .= '<img src="'.$filePrePath.'img/itineraries/locations/landscape/med/'.$selectedLocation['image_landscape'].'" alt="" />';
-        $slideHTML .= '</div>';
+        //$slideHTML .= '<div class="img-thmb">';
+        //$slideHTML .= '</div>';
         $slideHTML .= '<div class="contentHolder">';
+        $slideHTML .= '<img src="'.$filePrePath.'img/itineraries/locations/landscape/med/'.$selectedLocation['image_landscape'].'" alt="" />';
         $slideHTML .= stripcslashes($selectedLocation['content']);
         $slideHTML .= '</div>';
         $slideHTML .= '</div>';
@@ -103,19 +103,161 @@ $jsScript = <<< EOF
 
 
  $(function(){
-    $(window).resize(function() {
-        mySwiper.reInit();
+
+     var dragStartTime = 0;
+     var dragStartY = 0;
+     var dragHolderDiff = 0;
+     var originalDistanceFromBottom = 0;
+     var holderHeight = $('#swiperHolder').outerHeight();
+     var screenHeight = $(document).height();
+     var distanceFromBottom = 0;
+     var upperThreshold = (80 / 100) * screenHeight;
+     var lowerThreshold = $('.title').outerHeight() + 40;
+     var distanceCovered = 0;
+
+     setContentHeight();
+
+    $('body').on('mousedown touchstart', '.title', function(e)
+    {
+        e.stopPropagation();
+        holderHeight = $('#swiperHolder').outerHeight();
+        dragStartTime = e.timeStamp;
+        dragStartY = e.originalEvent.pageY;
+        distanceFromBottom = (screenHeight - dragStartY);
+        dragHolderDiff = (holderHeight - distanceFromBottom);
+        originalDistanceFromBottom = distanceFromBottom;
+
+    }).on('mousemove touchmove', '.title', function(e){
+        e.stopPropagation();
+        e.preventDefault();
+        var touch = e.originalEvent.touches[0] || e.originalEvent.changedTouches[0];
+        holderHeight = $('#swiperHolder').outerHeight();
+        distanceFromBottom = (screenHeight - touch.pageY);
+        if (dragStartY > 0 && ((distanceFromBottom + dragHolderDiff) < upperThreshold) && ((distanceFromBottom + dragHolderDiff) > lowerThreshold))
+        {
+            $('#swiperHolder').css({
+                height: ((screenHeight - touch.pageY) + dragHolderDiff)
+            })
+        }
+    }).on('touchend', '.title', function(e){
+
+        var timeSpan = (e.timeStamp - dragStartTime);
+        var touch = e.originalEvent.touches[0] || e.originalEvent.changedTouches[0];
+        distanceFromBottom = (screenHeight - touch.pageY);
+        distanceCovered = (distanceFromBottom - originalDistanceFromBottom);
+        holderHeight = $('#swiperHolder').outerHeight();
+
+        var velocity = (timeSpan/Math.abs(distanceCovered));
+
+        if (velocity < 5)
+        {
+            if ((holderHeight + distanceCovered) < lowerThreshold)
+            {
+                $('#swiperHolder').animate({
+                    height: lowerThreshold
+                }, timeSpan, function() {
+                    slidesDown();
+                })
+            }
+            else if ((holderHeight + distanceCovered) > upperThreshold)
+            {
+                $('#swiperHolder').animate({
+                    height: upperThreshold
+                }, timeSpan, function() {
+                    slidesUp();
+                })
+            }
+            else if ((holderHeight + distanceCovered) > lowerThreshold)
+            {
+                $('#swiperHolder').animate({
+                    height: (holderHeight + distanceCovered)
+                }, timeSpan, function() {
+                    slidesMiddled();
+                })
+            }
+        }
+        else
+        {
+            if ((holderHeight - lowerThreshold) < 40)
+            {
+                slidesDown();
+            }
+
+            else if ((upperThreshold - holderHeight) < 40)
+            {
+                slidesUp();
+            }
+            else
+            {
+                slidesMiddled();
+            }
+
+        }
     });
-    $(window).load(function() {
-        mySwiper.reInit();
+
+    {$scriptString}
+
+    var activeIndex = 0;
+    var activeLat = latLngArray[activeIndex].lat;
+    var activeLng = latLngArray[activeIndex].lng;
+    var activeLatLng = new google.maps.LatLng(activeLat,activeLng);
+    var activeSlide = $('.swiper-slide').eq(activeIndex);
+    var slideMode = 'down';
+
+    var mainSwiper = new Swiper('.swiper-container',
+    {
+        pagination: '.pagination',
+        paginationClickable: true,
+        centeredSlides: true,
+        slidesPerView: 'auto',
+        resizeReInit: true,
+        onSlideChangeEnd: function(swiper)
+        {
+            activeIndex = swiper.activeIndex;
+            activeSlide = $('.swiper-slide').eq(activeIndex);
+            activeLat = latLngArray[activeIndex].lat;
+            activeLng = latLngArray[activeIndex].lng;
+            activeLatLng = new google.maps.LatLng(activeLat,activeLng);
+            markerArray[swiper.previousIndex].setAnimation(null);
+            markerArray[swiper.previousIndex].setIcon('{$filePrePath}img/marker-orange-hollow.png');
+            markerArray[activeIndex].setIcon('{$filePrePath}img/marker-orange.png');
+            markerArray[activeIndex].setAnimation(google.maps.Animation.BOUNCE);
+            setTimeout(function() {
+             markerArray[activeIndex].setAnimation(null);
+        }, 750);
+            if (slideMode === 'up')
+            {
+                mapRecenterTop(activeLatLng);
+            }
+            else if (slideMode === 'middled')
+            {
+                mapRecenterTop(activeLatLng, calculateTargetPercent());
+            }
+            else
+            {
+                map.panTo(activeLatLng);
+            }
+        }
     });
+
 
     $('.get-position a').click(function(e) {
         e.preventDefault();
         if ($(this).hasClass('active') && markerInBounds(userLocationMarker))
         {
             $(this).removeClass('active');
-            map.panTo(activeLatLng);
+            if (slideMode === 'up')
+            {
+                mapRecenterTop(activeLatLng);
+            }
+            else if (slideMode === 'middled')
+            {
+                mapRecenterTop(activeLatLng,calculateTargetPercent());
+            }
+            else
+            {
+                map.panTo(activeLatLng);
+            }
             if (!$.isEmptyObject(userLocationMarker))
             {
                 //remove user location marker and accuracy circle - empty out objects
@@ -129,52 +271,70 @@ $jsScript = <<< EOF
         }
     });
 
-    var activeIndex = 0;
-    var activeLat = latLngArray[activeIndex].lat;
-    var activeLng = latLngArray[activeIndex].lng;
-    var activeLatLng = new google.maps.LatLng(activeLat,activeLng);
-    var activeSlide = $('.swiper-slide').eq(activeIndex);
+    function slidesUp()
+    {
+        $('.title').removeClass('up');
+        $('.title').addClass('down');
+        slideMode = 'up';
+        setContentHeight();
+        mapRecenterTop(activeLatLng);
+    }
 
-    var mySwiper = new Swiper('.swiper-container',{
-        pagination: '.pagination',
-        paginationClickable: true,
-        centeredSlides: true,
-        slidesPerView: 'auto',
-        resizeReInit: true,
-        onSlideChangeEnd: function(swiper) {
-            activeIndex = swiper.activeIndex;
-            activeSlide = $('.swiper-slide').eq(activeIndex);
-            activeLat = latLngArray[activeIndex].lat;
-            activeLng = latLngArray[activeIndex].lng;
-            activeLatLng = new google.maps.LatLng(activeLat,activeLng);
-            markerArray[swiper.previousIndex].setAnimation(null);
-            markerArray[swiper.previousIndex].setIcon('{$filePrePath}img/marker-orange-hollow.png')
-            markerArray[activeIndex].setIcon('{$filePrePath}img/marker-orange.png');
-            markerArray[activeIndex].setAnimation(google.maps.Animation.BOUNCE);
-            setTimeout(function() {
-                markerArray[activeIndex].setAnimation(null);
-            }, 750);
-            map.panTo(activeLatLng);
+    function slidesDown()
+    {
+        $('.title').removeClass('down');
+        $('.title').addClass('up');
+        slideMode = 'down';
+        setContentHeight();
+        map.setCenter(activeLatLng);
+    }
+
+     function slidesMiddled()
+     {
+        $('.title').removeClass('down');
+        $('.title').removeClass('up');
+        slideMode = 'middled';
+        setContentHeight();
+        var percentage = calculateTargetPercent();
+        if ($('#swiperHolder').outerHeight() > (screenHeight/2))
+        {
+            mapRecenterTop(activeLatLng, percentage);
         }
-    });
+        else
+        {
+           map.setCenter(activeLatLng);
+        }
+     }
 
-    $(function() {
-        $('body').on('click', '.toggle-up-down', function() {
-            if ($(this).hasClass('slide-up'))
-            {
-                $('.toggle-up-down').removeClass('slide-up').addClass('slide-down');
-                $('#swiperHolder').removeClass('holder-shrink').addClass('holder-grow');
-            }else if ($(this).hasClass('slide-down')) {
-                $('.toggle-up-down').removeClass('slide-down').addClass('slide-up');
-                $('#swiperHolder').removeClass('holder-grow').addClass('holder-shrink');
-            }
-        });
-    });
- });
-</script>
-<script>
+     function calculateTargetPercent(){
+        var heightPercentage = ($('#swiperHolder').outerHeight() / screenHeight) * 100;
+        var remainderHalved = (100 - heightPercentage) / 2;
+        var targetPercentage =  heightPercentage + remainderHalved;
+        return targetPercentage;
+     }
 
+      function setContentHeight() {
+         var contentHeight = ($('#swiperHolder').outerHeight() - $('.title').outerHeight()) - 30;
+         $('.contentHolder').css({
+             height: contentHeight
+         });
+     }
 
+    $('.contentHolder').scroll(function(e) {
+        //console.dir(e)
+        //console.log('scroll Top: ' + $(this).scrollTop());
+        var pos = $(this).scrollTop();
+        var titleEl = $(this).prev('.title');
+
+        if (pos > 0 && !titleEl.hasClass('shadowed'))
+        {
+            titleEl.addClass('shadowed');
+        }
+        else if (pos === 0 && titleEl.hasClass('shadowed'))
+        {
+            titleEl.removeClass('shadowed')
+        }
+    })
 
     var browserGeoLocationSupport = false;
     var userLocationMarker = {};
@@ -185,18 +345,9 @@ $jsScript = <<< EOF
     }
 
     var map;
-    var marker;
     var markerArray = [];
     var directionsDisplay;
     var directionsService = new google.maps.DirectionsService();
-
-    var polylineOptionsActual = new google.maps.Polyline({
-        strokeColor: '#6eb240',
-        strokeOpacity: 1.0,
-        strokeWeight: 3
-    });
-
-    {$scriptString}
 
     initialize();
 
@@ -213,7 +364,7 @@ $jsScript = <<< EOF
         mapOptions = {
             center: new google.maps.LatLng(latLngArray[0].lat,latLngArray[0].lng),
             zoom: 15,
-            zoomControl: false,
+            zoomControl: true,
             mapTypeControlOptions: {
                 style: google.maps.MapTypeControlStyle.DROPDOWN_MENU,
                 position: google.maps.ControlPosition.TOP_CENTER
@@ -227,6 +378,13 @@ $jsScript = <<< EOF
             {
                 "featureType": "transit.line",
                 "elementType": "geometry.fill",
+                "stylers": [
+                    {"visibility": "off" }
+                ]
+            },
+            {
+                "featureType": "transit.line",
+                "elementType": "labels",
                 "stylers": [
                     {"visibility": "off" }
                 ]
@@ -272,7 +430,7 @@ $jsScript = <<< EOF
                 "elementType":"geometry",
                 "stylers": [
                     {
-                        "visibility":"off"
+                        "visibility":"simplicity"
                     },
                     {
                         "color":"#c5dac6"
@@ -283,7 +441,7 @@ $jsScript = <<< EOF
                 "featureType":"administrative",
                 "stylers": [
                     {
-                        "visibility":"off"
+                        "visibility":"simplicity"
                     },
                     {
                         "lightness":33
@@ -342,6 +500,7 @@ $jsScript = <<< EOF
             (function(latLngArray){
                 var latLng = new google.maps.LatLng(latLngArray.lat,latLngArray.lng);
                 var icon;
+
                 if (i === 0)
                 {
                     icon = '{$filePrePath}img/marker-orange.png';
@@ -351,17 +510,24 @@ $jsScript = <<< EOF
                     icon = '{$filePrePath}img/marker-orange-hollow.png';
                 }
 
-                marker = new google.maps.Marker({
+                var marker = new google.maps.Marker({
+                    index: i,
                     position: latLng,
                     icon: icon,
                     map: map
                 });
+
                 markerArray.push(marker);
+
+                google.maps.event.addListener(marker, 'click', function(){
+                    //putting true in callback parameter allows icon change and animations to execute at emd of slide animation
+                    mainSwiper.swipeTo(marker.index, 300,true);
+                });
+
             }(latLngArray[i]));
         }
 
         google.maps.event.addListener(map, 'tilesloaded', function(evt) {
-            //$('#mapPreload').remove();
             $('#mapPreload').hide();
         });
 
@@ -395,6 +561,50 @@ $jsScript = <<< EOF
         }
     }
 
+
+     function calculateNewTargetPosY(p)
+     {
+         var screenHeight = $(document).height();
+         var screenMidY = screenHeight / 2;
+         //p is percentage of screenheight
+         var screenTargetY = (p / 100) * screenHeight;
+         var posYOffset =  screenTargetY - screenMidY;
+         return posYOffset;
+     }
+
+     function mapRecenter(latlng,offsetx,offsety) {
+         var point1 = map.getProjection().fromLatLngToPoint(
+             (latlng instanceof google.maps.LatLng) ? latlng : map.getCenter()
+         );
+         var point2 = new google.maps.Point(
+             ( (typeof(offsetx) == 'number' ? offsetx : 0) / Math.pow(2, map.getZoom()) ) || 0,
+             ( (typeof(offsety) == 'number' ? offsety : 0) / Math.pow(2, map.getZoom()) ) || 0
+         );
+         map.setCenter(map.getProjection().fromPointToLatLng(new google.maps.Point(
+             point1.x - point2.x,
+             point1.y + point2.y
+         )));
+     }
+
+     function mapRecenterTop(latlng, p) {
+
+         p = typeof p !== 'undefined' ? p : 85;
+
+         var offsetx = 0;
+         var offsety = calculateNewTargetPosY(p);
+         var point1 = map.getProjection().fromLatLngToPoint(
+             (latlng instanceof google.maps.LatLng) ? latlng : map.getCenter()
+         );
+         var point2 = new google.maps.Point(
+             ( (typeof(offsetx) == 'number' ? offsetx : 0) / Math.pow(2, map.getZoom()) ) || 0,
+             ( (typeof(offsety) == 'number' ? offsety : 0) / Math.pow(2, map.getZoom()) ) || 0
+         );
+         map.setCenter(map.getProjection().fromPointToLatLng(new google.maps.Point(
+             point1.x - point2.x,
+             point1.y + point2.y
+         )));
+     }
+
     function getUserLocation(el) {
         el.addClass('loading');
         // Try W3C Geolocation (Preferred)
@@ -425,12 +635,25 @@ $jsScript = <<< EOF
                     strokeOpacity: 0.25,
                     strokeWeight: 1
                 });
-                map.setCenter(initialLocation);
-                map.fitBounds(userLocationAccuracyCircle.getBounds());
+
+                if (slideMode === 'up')
+                {
+                    mapRecenterTop(initialLocation);
+                }
+                else if (slideMode === 'middled')
+                {
+                    mapRecenterTop(initialLocation, calculateTargetPercent());
+                }
+                else
+                {
+                    map.setCenter(initialLocation);
+                }
+                //map.setCenter(initialLocation);
+                //map.fitBounds(userLocationAccuracyCircle.getBounds());
                 el.removeClass('loading');
             }, function() {
-                handleNoGeolocation(browserGeoLocationSupport);
                 el.removeClass('loading');
+                handleNoGeolocation(browserGeoLocationSupport);
             });
         }
         // Browser doesn't support Geolocation
@@ -442,9 +665,11 @@ $jsScript = <<< EOF
 
     function handleNoGeolocation(errorFlag) {
         if (errorFlag == true) {
+            el.removeClass('loading');
             alert("Geolocation service failed.");
             initialLocation = sydney;
         } else {
+            el.removeClass('loading');
             alert("Your browser doesn't support geolocation. We've placed you in Sydney.");
             initialLocation = sydney;
         }
@@ -454,7 +679,7 @@ $jsScript = <<< EOF
     function markerInBounds(marker){
         return map.getBounds().contains(marker.getPosition());
     }
-
+ });
 
 </script>
 EOF;

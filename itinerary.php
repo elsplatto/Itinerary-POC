@@ -64,7 +64,6 @@ if (!empty($_GET['id']))
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0" />
-    <meta name="apple-mobile-web-app-capable" content="yes">
     <title>Itinerary - <?=$itineraryDetail['title']?></title>
     <link rel="stylesheet" href="css/idangerous.swiper.css" />
     <link rel="stylesheet" href="css/style.css" />
@@ -115,7 +114,6 @@ if (!empty($_GET['id']))
 
 
 <script src="js/vendor/jquery.js"></script>
-<script src="js/vendor/jquery.touchSwipe.min.js"></script>
 <script src="js/vendor/swiper/idangerous.swiper-2.1.min.js"></script>
 <script>
 
@@ -130,10 +128,9 @@ if (!empty($_GET['id']))
      var distanceFromBottom = 0;
      var upperThreshold = (80 / 100) * screenHeight;
      var lowerThreshold = $('.title').outerHeight() + 40;
-     var swipeDirection = '';
      var distanceCovered = 0;
 
-     //console.log('title height: ' + $('.title').outerHeight())
+     setContentHeight();
 
     $('body').on('mousedown touchstart', '.title', function(e)
     {
@@ -144,146 +141,74 @@ if (!empty($_GET['id']))
         distanceFromBottom = (screenHeight - dragStartY);
         dragHolderDiff = (holderHeight - distanceFromBottom);
         originalDistanceFromBottom = distanceFromBottom;
-        console.dir(e)
-        if (e.type === 'mousedown')
-        {
-            console.log('touch start: ' + distanceFromBottom);
-            console.log('touch start holder height: ' + holderHeight);
-        }
+
     }).on('mousemove touchmove', '.title', function(e){
         e.stopPropagation();
         e.preventDefault();
         var touch = e.originalEvent.touches[0] || e.originalEvent.changedTouches[0];
         holderHeight = $('#swiperHolder').outerHeight();
         distanceFromBottom = (screenHeight - touch.pageY);
-        //console.log('touch move: ' + distanceFromBottom);
         if (dragStartY > 0 && ((distanceFromBottom + dragHolderDiff) < upperThreshold) && ((distanceFromBottom + dragHolderDiff) > lowerThreshold))
         {
             $('#swiperHolder').css({
                 height: ((screenHeight - touch.pageY) + dragHolderDiff)
             })
         }
-        //asses direction
-        if (originalDistanceFromBottom < distanceFromBottom)
-        {
-            swipeDirection = 'up';
-        }
-        else if (originalDistanceFromBottom > distanceFromBottom)
-        {
-            swipeDirection = 'down';
-        }
     }).on('touchend', '.title', function(e){
 
         var timeSpan = (e.timeStamp - dragStartTime);
         var touch = e.originalEvent.touches[0] || e.originalEvent.changedTouches[0];
         distanceFromBottom = (screenHeight - touch.pageY);
-        console.log('touch end: ' + distanceFromBottom);
-        console.log('touch end holder height: ' + holderHeight);
-        /*if (swipeDirection === 'up')
-        {
-            distanceCovered = (distanceFromBottom - originalDistanceFromBottom);
-        }
-        else if (swipeDirection === 'down')
-        {
-            distanceCovered = (originalDistanceFromBottom - distanceFromBottom);
-        }*/
         distanceCovered = (distanceFromBottom - originalDistanceFromBottom);
-        console.log('distance covered: ' + distanceCovered)
-        /*if ((upperThreshold - $('#swiperHolder').outerHeight()) < 10)
+        holderHeight = $('#swiperHolder').outerHeight();
+
+        var velocity = (timeSpan/Math.abs(distanceCovered));
+
+        if (velocity < 5)
         {
-            slidesUp();
-        }
-        else if (($('#swiperHolder').outerHeight() - lowerThreshold) < 10)
-        {
-            slidesDown();
+            if ((holderHeight + distanceCovered) < lowerThreshold)
+            {
+                $('#swiperHolder').animate({
+                    height: lowerThreshold
+                }, timeSpan, function() {
+                    slidesDown();
+                })
+            }
+            else if ((holderHeight + distanceCovered) > upperThreshold)
+            {
+                $('#swiperHolder').animate({
+                    height: upperThreshold
+                }, timeSpan, function() {
+                    slidesUp();
+                })
+            }
+            else if ((holderHeight + distanceCovered) > lowerThreshold)
+            {
+                $('#swiperHolder').animate({
+                    height: (holderHeight + distanceCovered)
+                }, timeSpan, function() {
+                    slidesMiddled();
+                })
+            }
         }
         else
         {
-            slidesMiddled();
-        }*/
-
-        var velocity = (distanceCovered/timeSpan);
-        var rollingDistance = 0;
-
-        /*if (velocity > 0.3)
-        {
-            if (swipeDirection === 'up' )
+            if ((holderHeight - lowerThreshold) < 40)
             {
-                if ($('#swiperHolder').outerHeight() < upperThreshold)
-                {
-                    if ((($('#swiperHolder').outerHeight() + distanceCovered) + dragHolderDiff) < (upperThreshold - $('#swiperHolder').outerHeight()))
-                    {
-                        rollingDistance = distanceCovered;
-                    }
-                    else
-                    {
-                        rollingDistance = (upperThreshold - $('#swiperHolder').outerHeight());
-                    }
-
-                    $('#swiperHolder').animate({
-                        height: $('#swiperHolder').outerHeight() + rollingDistance
-                    }, timeSpan, function() {
-                        if ($('#swiperHolder').outerHeight() > upperThreshold)
-                        {
-                            $('#swiperHolder').css({
-                                height: upperThreshold
-                            })
-                        }
-                    });
-                }
+                slidesDown();
             }
-            else if (swipeDirection === 'down' )
+
+            else if ((upperThreshold - holderHeight) < 40)
             {
-                //console.log('(holder height - distance covered) + drag holder diff: ' + (($('#swiperHolder').outerHeight() - distanceCovered) + dragHolderDiff));
-                //console.log('holder height - lower threshold' + ($('#swiperHolder').outerHeight() - lowerThreshold))
-                if ($('#swiperHolder').outerHeight() > lowerThreshold)
-                {
-                    if ((($('#swiperHolder').outerHeight() - distanceCovered) + dragHolderDiff) > ($('#swiperHolder').outerHeight() - lowerThreshold))
-                    {
-
-                        rollingDistance = (lowerThreshold - $('#swiperHolder').outerHeight());
-                    }
-                    else
-                    {
-                        rollingDistance = distanceCovered + dragHolderDiff;
-                    }
-
-                    $('#swiperHolder').animate({
-                        height: $('#swiperHolder').outerHeight() + rollingDistance
-                    }, timeSpan, function() {
-                        assessThresholds();
-                    });
-                }
+                slidesUp();
             }
-        }*/
-
-
-        //console.log('height: ' + $('#swiperHolder').outerHeight());
-        //console.log('upper threshold: ' + upperThreshold);
+            else
+            {
+                slidesMiddled();
+            }
+        }
     });
 
-
-     function assessThresholds() {
-         if ($('#swiperHolder').outerHeight() > upperThreshold)
-         {
-             $('#swiperHolder').css({
-                 height: upperThreshold
-             })
-             slidesUp();
-         }
-         else if ($('#swiperHolder').outerHeight() < lowerThreshold)
-         {
-             $('#swiperHolder').css({
-                 height: lowerThreshold
-             });
-             slidesDown();
-         }
-         else
-         {
-             slidesMiddled();
-         }
-
-     }
 
      <?php
      $i = 0;
@@ -332,9 +257,13 @@ if (!empty($_GET['id']))
             setTimeout(function() {
              markerArray[activeIndex].setAnimation(null);
         }, 750);
-            if (slideMode == 'up')
+            if (slideMode === 'up')
             {
                 mapRecenterTop(activeLatLng);
+            }
+            else if (slideMode === 'middled')
+            {
+                mapRecenterTop(activeLatLng, calculateTargetPercent());
             }
             else
             {
@@ -343,15 +272,18 @@ if (!empty($_GET['id']))
         }
     });
 
-
     $('.get-position a').click(function(e) {
         e.preventDefault();
         if ($(this).hasClass('active') && markerInBounds(userLocationMarker))
         {
             $(this).removeClass('active');
-            if (slideMode == 'up')
+            if (slideMode === 'up')
             {
                 mapRecenterTop(activeLatLng);
+            }
+            else if (slideMode === 'middled')
+            {
+                mapRecenterTop(activeLatLng,calculateTargetPercent());
             }
             else
             {
@@ -370,21 +302,12 @@ if (!empty($_GET['id']))
         }
     });
 
-    /*$('body').on('click', '.toggle-up-down', function() {
-        if ($(this).hasClass('slide-up'))
-        {
-            slidesUp();
-        } else if ($(this).hasClass('slide-down'))
-        {
-            slidesDown();
-        }
-    });*/
-
     function slidesUp()
     {
         $('.title').removeClass('up');
         $('.title').addClass('down');
         slideMode = 'up';
+        setContentHeight();
         mapRecenterTop(activeLatLng);
     }
 
@@ -393,6 +316,7 @@ if (!empty($_GET['id']))
         $('.title').removeClass('down');
         $('.title').addClass('up');
         slideMode = 'down';
+        setContentHeight();
         map.setCenter(activeLatLng);
     }
 
@@ -400,9 +324,48 @@ if (!empty($_GET['id']))
      {
          $('.title').removeClass('down');
          $('.title').removeClass('up');
-         slideMode = 'down';
-         map.setCenter(activeLatLng);
+         slideMode = 'middled';
+         setContentHeight();
+         var percentage = calculateTargetPercent();
+         if ($('#swiperHolder').outerHeight() > (screenHeight/2))
+         {
+             mapRecenterTop(activeLatLng, percentage);
+         }
+         else
+         {
+            map.setCenter(activeLatLng);
+         }
      }
+
+     function calculateTargetPercent(){
+        var heightPercentage = ($('#swiperHolder').outerHeight() / screenHeight) * 100;
+        var remainderHalved = (100 - heightPercentage) / 2;
+        var targetPercentage =  heightPercentage + remainderHalved;
+        return targetPercentage;
+     }
+
+     function setContentHeight() {
+         var contentHeight = ($('#swiperHolder').outerHeight() - $('.title').outerHeight()) - 30;
+         $('.contentHolder').css({
+             height: contentHeight
+         });
+     }
+
+    $('.contentHolder').scroll(function(e) {
+        //console.dir(e)
+        //console.log('scroll Top: ' + $(this).scrollTop());
+        var pos = $(this).scrollTop();
+        var titleEl = $(this).prev('.title');
+
+        if (pos > 0 && !titleEl.hasClass('shadowed'))
+        {
+            titleEl.addClass('shadowed');
+        }
+        else if (pos === 0 && titleEl.hasClass('shadowed'))
+        {
+            titleEl.removeClass('shadowed')
+        }
+    })
 
     var browserGeoLocationSupport = false;
     var userLocationMarker = {};
@@ -630,12 +593,12 @@ if (!empty($_GET['id']))
     }
 
 
-     function calculateNewTargetPosY()
+     function calculateNewTargetPosY(p)
      {
          var screenHeight = $(document).height();
          var screenMidY = screenHeight / 2;
-         //let's get the spot at 90% up the screen
-         var screenTargetY = (90 / 100) * screenHeight;
+         //p is percentage of screenheight
+         var screenTargetY = (p / 100) * screenHeight;
          var posYOffset =  screenTargetY - screenMidY;
          return posYOffset;
      }
@@ -654,9 +617,12 @@ if (!empty($_GET['id']))
          )));
      }
 
-     function mapRecenterTop(latlng) {
+     function mapRecenterTop(latlng, p) {
+
+         p = typeof p !== 'undefined' ? p : 85;
+
          var offsetx = 0;
-         var offsety = calculateNewTargetPosY();
+         var offsety = calculateNewTargetPosY(p);
          var point1 = map.getProjection().fromLatLngToPoint(
              (latlng instanceof google.maps.LatLng) ? latlng : map.getCenter()
          );
@@ -701,9 +667,13 @@ if (!empty($_GET['id']))
                     strokeWeight: 1
                 });
 
-                if (slideMode == 'up')
+                if (slideMode === 'up')
                 {
                     mapRecenterTop(initialLocation);
+                }
+                else if (slideMode === 'middled')
+                {
+                    mapRecenterTop(initialLocation, calculateTargetPercent());
                 }
                 else
                 {
