@@ -88,9 +88,6 @@ if (!empty($_GET['id']))
                     <h2><?=$selectedLocation['title']?></h2>
                     <!--span><?=$selectedLocation['sub_title']?></span-->
                 </div>
-                <!--div class="img-thmb">
-                    <img src="img/itineraries/locations/landscape/med/<?=$selectedLocation['image_landscape']?>" alt="" />
-                </div-->
                 <div class="contentHolder">
                     <img src="img/itineraries/locations/landscape/med/<?=$selectedLocation['image_landscape']?>" alt="" />
                     <?=stripcslashes($selectedLocation['content'])?>
