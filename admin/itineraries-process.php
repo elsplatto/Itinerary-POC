@@ -7,12 +7,13 @@ assessLogin($securityArrAuthor);
 
 $error_msg = '';
 
-if (!empty($_POST))
+if (isset($_POST))
 {
-    if (!empty($_POST['itineraryId']))
+    if (isset($_POST['itineraryId']))
     {
         if ($_POST['itineraryId'] > 0)
         {
+            //update
             $itineraryId = $_POST['itineraryId'];
             $date_last_modified = time();
         }
@@ -27,9 +28,11 @@ if (!empty($_POST))
         $itineraryId = 0;
         $date_created = time();
     }
+    //echo('['.$itineraryId.']');
     $title = $_POST['txtTitle'];
     $page_name = $_POST['txtPageName'];
     $sub_title = $_POST['txtSubTitle'];
+    $credit = $_POST['txtCredit'];
     $intro_text = $_POST['txtIntroText'];
     $description = $_POST['txtDescription'];
     $image_landscape = $_POST['txtImgLandscape'];
@@ -123,26 +126,38 @@ if (!empty($_POST))
     {
         $filename = $json_file_prefix . $itineraryId . '-' . $date_last_modified .'.json';
         $mysqli = new mysqli($DB_SERVER, $DB_USERNAME, $DB_PASSWORD, $DB_DATABASE);
-        $query = 'UPDATE itinerary SET title = ?, page_name = ?, sub_title = ?, intro_text = ?, description = ?, image_landscape = ?, image_portrait = ?, date_last_modified = ?, json_filename = ?, is_live = ? WHERE id = ?';
+        $query = 'UPDATE itinerary SET title = ?, page_name = ?, sub_title = ?, credit = ?, intro_text = ?, description = ?, image_landscape = ?, image_portrait = ?, date_last_modified = ?, json_filename = ?, is_live = ? WHERE id = ?';
         $stmt = $mysqli->prepare($query);
-        $stmt->bind_param('sssssssisii', $title, $page_name, $mysqli->real_escape_string($sub_title), $mysqli->real_escape_string($intro_text), $mysqli->real_escape_string($description), $image_landscape, $image_portrait, $date_last_modified, $filename, $is_live, $itineraryId);
+        $stmt->bind_param('ssssssssisii', $title, $page_name, $mysqli->real_escape_string($sub_title), $credit, $mysqli->real_escape_string($intro_text), $mysqli->real_escape_string($description), $image_landscape, $image_portrait, $date_last_modified, $filename, $is_live, $itineraryId);
         $stmt->execute();
     }
     else
     {
+
+        /*echo('insert');
+        echo('title: '.$title.'<br />');
+        echo('page_name: '.$page_name.'<br />');
+        echo('sub_title: '.$sub_title.'<br />');
+        echo('credit: '.$credit.'<br />');
+        echo('intro_text: '.$intro_text.'<br />');
+        echo('description: '.$description.'<br />');
+        echo('image_landscape: '.$image_landscape.'<br />');
+        echo('image_portrait: '.$image_portrait.'<br />');
+        echo('date_created: '.$date_created.'<br />');
+        echo('is_live: '.$is_live.'<br />');*/
         $mysqli = new mysqli($DB_SERVER, $DB_USERNAME, $DB_PASSWORD, $DB_DATABASE);
-        $query = 'INSERT INTO itinerary (title, page_name, sub_title, intro_text, description, image_landscape, image_portrait, date_created, is_live) VALUES (?,?,?,?,?,?,?,?,?)';
+        $query = 'INSERT INTO itinerary (title, page_name, sub_title, credit, intro_text, description, image_landscape, image_portrait, date_created, is_live) VALUES (?,?,?,?,?,?,?,?,?,?)';
 
         $stmt = $mysqli->prepare($query);
-        $stmt->bind_param('sssssssii', $title, $page_name, $mysqli->real_escape_string($sub_title), $mysqli->real_escape_string($intro_text), $mysqli->real_escape_string($description), $image_landscape, $image_portrait, $date_created, $is_live);
+        $stmt->bind_param('ssssssssii', $title, $page_name, $mysqli->real_escape_string($sub_title), $credit, $mysqli->real_escape_string($intro_text), $mysqli->real_escape_string($description), $image_landscape, $image_portrait, $date_created, $is_live);
         $stmt->execute();
         $new_id = $mysqli->insert_id;
 
-        $filename = $json_file_prefix . $new_id . '-' . $date_created .'.json';
+        /*$filename = $json_file_prefix . $new_id . '-' . $date_created .'.json';
         $query = 'UPDATE itinerary SET json_filename = ? WHERE id = ?';
         $stmt = $mysqli->prepare($query);
         $stmt->bind_param('si', $filename, $new_id);
-        $stmt->execute();
+        $stmt->execute();*/
     }
 
 
@@ -164,7 +179,7 @@ if (!isset($itineraryId))
     }
 }
 
-if (isset($itineraryId))
+if (isset($itineraryId) && $itineraryId > 0)
 {
     $mysqli = new mysqli($DB_SERVER, $DB_USERNAME, $DB_PASSWORD, $DB_DATABASE);
 
@@ -206,10 +221,10 @@ if (isset($itineraryId))
     }
 
     $mysqli2 = new mysqli($DB_SERVER, $DB_USERNAME, $DB_PASSWORD, $DB_DATABASE);
-    $stmt2 = $mysqli2->prepare('SELECT il.id, il.title, il.image_landscape, il.image_portrait, il.lat, il.lng, il.tags FROM itinerary_locations il JOIN itinerary_itinerary_location iil ON iil.itinerary_location_id = il.id WHERE iil.itinerary_id = ? ORDER BY iil.sequence');
+    $stmt2 = $mysqli2->prepare('SELECT il.id, il.title, il.image_landscape, il.image_portrait, il.content, il.lat, il.lng, il.tags FROM itinerary_locations il JOIN itinerary_itinerary_location iil ON iil.itinerary_location_id = il.id WHERE iil.itinerary_id = ? ORDER BY iil.sequence');
     $stmt2->bind_param('i', $itineraryId);
     $stmt2->execute();
-    $stmt2->bind_result($id, $title, $image_landscape, $image_portrait, $lat, $lng, $tags);
+    $stmt2->bind_result($id, $title, $image_landscape, $image_portrait, $content, $lat, $lng, $tags);
     $innerResults = array();
     $i = 0;
     $json .= ', "locations": [';
@@ -219,6 +234,7 @@ if (isset($itineraryId))
         $innerResults[$i]['title'] = $title;
         $innerResults[$i]['image_landscape'] = $image_landscape;
         $innerResults[$i]['image_portrait'] = $image_portrait;
+        $innerResults[$i]['content'] = $content;
         $innerResults[$i]['lat'] = $lat;
         $innerResults[$i]['lng'] = $lng;
         $innerResults[$i]['tags'] = $tags;
@@ -272,6 +288,7 @@ else
         $error_msg += ',';
     }
     $error_msg += 'Failed to successfully write new json file.';
+
 }
 
 /*
@@ -283,7 +300,7 @@ END-PROCESS JSON FILE
 
 
 
-if (strlen($error_msg) > 0)
+/*if (strlen($error_msg) > 0)
 {
     if ($itineraryId > 0)
     {
@@ -304,5 +321,5 @@ else
     {
         header('Location: itineraries-list.php?new_id='.$new_id.'&success_msg=Itinerary successfully added');
     }
-}
+}*/
 ?>

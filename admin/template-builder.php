@@ -534,7 +534,7 @@ $jsScript = <<< EOF
         function calcRoute() {
             var start, end;
             var waypoints = [];
-            var endpoint = (latLngArray.length - 2);//remember our array is zero-based
+            var endpoint = (latLngArray.length - 1);//remember our array is zero-based
             start = new google.maps.LatLng(latLngArray[0].lat,latLngArray[0].lng);
             end = new google.maps.LatLng(latLngArray[latLngArray.length - 1].lat,latLngArray[latLngArray.length - 1].lng);
             for (var i = 1; i < endpoint; i++)

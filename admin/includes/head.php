@@ -8,6 +8,11 @@ if (!isset($needsCalendar) || is_null($needsCalendar))
 {
     $needsCalendar = false;
 }
+
+if (!isset($needsConfirmRemove) || is_null($needsConfirmRemove))
+{
+    $needsConfirmRemove = false;
+}
 ?>
 <link rel="stylesheet" href="../css/foundation.css" />
 <link rel="stylesheet" href="css/smoothness/jquery-ui-1.10.4.custom.css" />
@@ -17,8 +22,14 @@ if (!isset($needsCalendar) || is_null($needsCalendar))
 <?php
 if ($needsCalendar)
 {
-?>
-<script src="js/plugins/jquery-ui-timepicker.js"></script>
+    ?>
+    <script src="js/plugins/jquery-ui-timepicker.js"></script>
+<?php
+}
+if ($needsConfirmRemove)
+{
+    ?>
+    <script src="js/plugins/jquery-confirmRemove.js"></script>
 <?php
 }
 if ($needsMaps)

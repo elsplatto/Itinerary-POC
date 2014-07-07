@@ -27,7 +27,7 @@ assessLogin($securityArrAuthor);
 <section>
     <div class="row">
         <div class="large-12 columns">
-            <form enctype="multipart/form-data" id="frmItinerary" name="frmItinerary" action="itineraries-process.php" method="post" data-abide>
+            <form enctype="multipart/form-data" id="frmItinerary" name="frmItinerary" action="itineraries-process-2.php" method="post" data-abide>
 
                 <label for="txtTitle">Title:<span class="red">*</span>
                     <input type="text" id="txtTitle" name="txtTitle" autocomplete="off" required />
@@ -57,13 +57,13 @@ assessLogin($securityArrAuthor);
                 <label for="txtImgLandscape">Landscape Image (1200 x 640):
                     <input type="hidden" id="txtImgLandscape" name="txtImgLandscape" />
                     <input type="file" id="landscapeImgUpload" name="landscapeImgUpload" />
-                    <inpu type="hidden" name="landscapeDir" id="landscapeDir" value="../img/itineraries/landscape/" />
+                    <inpu type="hidden" name="landscapeDir" id="landscapeDir" value="../../img/itineraries/landscape/" />
                 </label>
 
                 <label for="txtImgPortrait">Portrait Image (640 x 1200):
                     <input type="hidden" id="txtImgPortrait" name="txtImgPortrait" />
                     <input type="file" id="portraitImgUpload" name="portraitImgUpload" />
-                    <inpu type="hidden" name="portraitDir" id="portraitDir" value="../img/itineraries/portrait/" />
+                    <inpu type="hidden" name="portraitDir" id="portraitDir" value="../../img/itineraries/portrait/" />
                 </label>
 
 

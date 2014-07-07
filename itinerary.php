@@ -29,7 +29,7 @@ function getItineraryDetail($id,$DB_SERVER, $DB_USERNAME, $DB_PASSWORD, $DB_DATA
 function getSelectedLocations($id,$DB_SERVER, $DB_USERNAME, $DB_PASSWORD, $DB_DATABASE)
 {
     $mysqli = new mysqli($DB_SERVER, $DB_USERNAME, $DB_PASSWORD, $DB_DATABASE);
-    $stmt = $mysqli->prepare('SELECT il.id, il.title, sub_title, il.image_landscape, il.lat, il.lng, il.address, content FROM itinerary_locations il JOIN itinerary_itinerary_location iil ON iil.itinerary_location_id = il.id WHERE iil.itinerary_id = ? ORDER BY iil.sequence');
+    $stmt = $mysqli->prepare('SELECT il.id, il.title, sub_title, il.image_landscape, il.lat, il.lng, il.address, il.content FROM itinerary_locations il JOIN itinerary_itinerary_location iil ON iil.itinerary_location_id = il.id WHERE iil.itinerary_id = ? ORDER BY iil.sequence');
     $stmt->bind_param('i', $id);
     $stmt->execute();
     $stmt->bind_result($id, $title, $sub_title, $image_landscape, $lat, $lng, $address, $content);
@@ -392,7 +392,7 @@ if (!empty($_GET['id']))
         mapOptions = {
             center: new google.maps.LatLng(latLngArray[0].lat,latLngArray[0].lng),
             zoom: 15,
-            zoomControl: true,
+            zoomControl: false,
             mapTypeControlOptions: {
                 style: google.maps.MapTypeControlStyle.DROPDOWN_MENU,
                 position: google.maps.ControlPosition.TOP_CENTER
@@ -401,6 +401,7 @@ if (!empty($_GET['id']))
 
         map = new google.maps.Map(document.getElementById("mapCanvas"),mapOptions);
         directionsDisplay.setMap(map);
+
 
         var styles = [
             {
@@ -559,10 +560,12 @@ if (!empty($_GET['id']))
             $('#mapPreload').hide();
         });
 
+        fitBoundsToMarkers();
+
         function calcRoute() {
             var start, end;
             var waypoints = [];
-            var endpoint = (latLngArray.length - 2);//remember our array is zero-based
+            var endpoint = (latLngArray.length - 1);//remember our array is zero-based
             start = new google.maps.LatLng(latLngArray[0].lat,latLngArray[0].lng);
             end = new google.maps.LatLng(latLngArray[latLngArray.length - 1].lat,latLngArray[latLngArray.length - 1].lng);
             for (var i = 1; i < endpoint; i++)
@@ -590,34 +593,33 @@ if (!empty($_GET['id']))
     }
 
 
-     function calculateNewTargetPosY(p)
-     {
-         var screenHeight = $(document).height();
-         var screenMidY = screenHeight / 2;
-         //p is percentage of screenheight
-         var screenTargetY = (p / 100) * screenHeight;
-         var posYOffset =  screenTargetY - screenMidY;
-         return posYOffset;
-     }
+    function calculateNewTargetPosY(p)
+    {
+        var screenHeight = $(document).height();
+        var screenMidY = screenHeight / 2;
+        //p is percentage of screenheight
+        var screenTargetY = (p / 100) * screenHeight;
+        var posYOffset =  screenTargetY - screenMidY;
+        return posYOffset;
+    }
 
-     function mapRecenter(latlng,offsetx,offsety) {
-         var point1 = map.getProjection().fromLatLngToPoint(
-             (latlng instanceof google.maps.LatLng) ? latlng : map.getCenter()
-         );
-         var point2 = new google.maps.Point(
-             ( (typeof(offsetx) == 'number' ? offsetx : 0) / Math.pow(2, map.getZoom()) ) || 0,
-             ( (typeof(offsety) == 'number' ? offsety : 0) / Math.pow(2, map.getZoom()) ) || 0
-         );
-         map.setCenter(map.getProjection().fromPointToLatLng(new google.maps.Point(
-             point1.x - point2.x,
-             point1.y + point2.y
-         )));
-     }
+    function mapRecenter(latlng,offsetx,offsety) {
+        var point1 = map.getProjection().fromLatLngToPoint(
+            (latlng instanceof google.maps.LatLng) ? latlng : map.getCenter()
+        );
+        var point2 = new google.maps.Point(
+            ( (typeof(offsetx) == 'number' ? offsetx : 0) / Math.pow(2, map.getZoom()) ) || 0,
+            ( (typeof(offsety) == 'number' ? offsety : 0) / Math.pow(2, map.getZoom()) ) || 0
+        );
+        map.setCenter(map.getProjection().fromPointToLatLng(new google.maps.Point(
+            point1.x - point2.x,
+            point1.y + point2.y
+        )));
+    }
 
-     function mapRecenterTop(latlng, p) {
-
-         p = typeof p !== 'undefined' ? p : 85;
-
+    function mapRecenterTop(latlng, p)
+    {
+        p = typeof p !== 'undefined' ? p : 85;
          var offsetx = 0;
          var offsety = calculateNewTargetPosY(p);
          var point1 = map.getProjection().fromLatLngToPoint(
@@ -689,6 +691,16 @@ if (!empty($_GET['id']))
             handleNoGeolocation(browserGeoLocationSupport);
             el.removeClass('loading');
         }
+    }
+
+    function fitBoundsToMarkers() {
+        var bounds = new google.maps.LatLngBounds();
+        for (var i=0;i<markerArray.length;i++)
+        {
+            bounds.extend( markerArray[i].getPosition() );
+        }
+
+        map.fitBounds(bounds);
     }
 
     function handleNoGeolocation(errorFlag) {

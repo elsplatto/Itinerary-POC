@@ -3,3 +3,6 @@ dbScripts/*
 includes/db.php
 includes/site-settings.php
 .DS_Store
+includes/class.config.php
+
+includes/class.dbConnection.php

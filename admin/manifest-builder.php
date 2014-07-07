@@ -3,10 +3,12 @@
 
 if (!isset($itineraryDetail) && isset($itineraryId))
 {
+    echo('set itinerary details - manifest builder');
     $itineraryDetail = getItineraryDetail($itineraryId,$DB_SERVER, $DB_USERNAME, $DB_PASSWORD, $DB_DATABASE);
 }
 if (!isset($selectedLocations) && isset($itineraryId))
 {
+    echo('set itinerary locations - manifest builder');
     $selectedLocations = getSelectedLocations($itineraryId,$DB_SERVER, $DB_USERNAME, $DB_PASSWORD, $DB_DATABASE);
 }
 

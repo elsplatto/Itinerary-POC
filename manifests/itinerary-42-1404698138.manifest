@@ -1,0 +1,27 @@
+CACHE MANIFEST
+# 2014-07-07 11:55:38
+#static files
+CACHE:
+http://localhost/~jasontaikato/itinerary/itinerary/test-itinerary-2-update.html
+http://localhost/~jasontaikato/itinerary/css/idangerous.swiper.css
+http://localhost/~jasontaikato/itinerary/css/swiper.css
+http://localhost/~jasontaikato/itinerary/css/style.css
+http://localhost/~jasontaikato/itinerary/css/img/sprite.png
+http://localhost/~jasontaikato/itinerary/css/img/preloader-2.gif
+http://localhost/~jasontaikato/itinerary/css/img/preloader-2-sml.gif
+http://localhost/~jasontaikato/itinerary/js/vendor/jquery.js
+http://localhost/~jasontaikato/itinerary/js/vendor/modernizr.js
+http://localhost/~jasontaikato/itinerary/js/vendor/swiper/idangerous.swiper-2.1.min.js
+http://localhost/~jasontaikato/itinerary/img/marker-orange-hollow.png
+http://localhost/~jasontaikato/itinerary/img/marker-orange.png
+http://localhost/~jasontaikato/itinerary/img/location-dot.png
+#dynamic files
+http://localhost/~jasontaikato/itinerary/img/itineraries/landscape/landscape-test.png
+http://localhost/~jasontaikato/itinerary/img/itineraries/portrait/portrait-test.png
+http://localhost/~jasontaikato/itinerary/img/itineraries/locations/landscape/med/fortune-of-war.jpg
+http://localhost/~jasontaikato/itinerary/img/itineraries/locations/landscape/med/the-glenmore.jpg
+http://localhost/~jasontaikato/itinerary/img/itineraries/locations/landscape/med/the-royal-oaks.jpg
+
+
+NETWORK:
+*

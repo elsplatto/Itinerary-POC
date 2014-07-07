@@ -16,10 +16,10 @@ else
 function getItinerary($id, $DB_SERVER, $DB_USERNAME, $DB_PASSWORD, $DB_DATABASE)
 {
     $mysqli = new mysqli($DB_SERVER, $DB_USERNAME, $DB_PASSWORD, $DB_DATABASE);
-    $stmt = $mysqli->prepare('SELECT title, page_name, sub_title, intro_text, description, image_landscape, image_portrait, is_live FROM itinerary WHERE id = ?');
+    $stmt = $mysqli->prepare('SELECT title, page_name, sub_title, intro_text, credit, description, image_landscape, image_portrait, is_live FROM itinerary WHERE id = ?');
     $stmt->bind_param('i', $id);
     $stmt->execute();
-    $stmt->bind_result($title, $page_name, $sub_title, $intro_text, $description, $image_landscape, $image_portrait,  $is_live);
+    $stmt->bind_result($title, $page_name, $sub_title, $intro_text, $credit, $description, $image_landscape, $image_portrait,  $is_live);
 
     $results = array();
     while($stmt->fetch())
@@ -28,6 +28,7 @@ function getItinerary($id, $DB_SERVER, $DB_USERNAME, $DB_PASSWORD, $DB_DATABASE)
         $results['page_name'] = $page_name;
         $results['sub_title'] = $sub_title;
         $results['intro_text'] = $intro_text;
+        $results['credit'] = $credit;
         $results['description'] = $description;
         $results['image_landscape'] = $image_landscape;
         $results['image_portrait'] = $image_portrait;
@@ -110,7 +111,7 @@ $selectedLocations = getSelectedLocation($itineraryId, $DB_SERVER, $DB_USERNAME,
 <section>
     <div class="row">
         <div class="large-12 columns">
-            <form enctype="multipart/form-data" id="frmItinerary" name="frmItinerary" action="itineraries-process.php" method="post" data-abide>
+            <form enctype="multipart/form-data" id="frmItinerary" name="frmItinerary" action="itineraries-process-2.php" method="post" data-abide>
                 <input type="hidden" id="itineraryId" name="itineraryId" value="<?=$itineraryId?>" />
                 <label for="txtTitle">Title:<span class="red">*</span>
                     <input type="text" id="txtTitle" name="txtTitle" value="<?=stripcslashes($itineraryDetails['title'])?>" required />
@@ -124,6 +125,10 @@ $selectedLocations = getSelectedLocation($itineraryId, $DB_SERVER, $DB_USERNAME,
                 </label>
 
 
+
+                <label for="txtCredit">Credit:
+                    <input type="text" id="txtCredit" name="txtCredit" value="<?=$itineraryDetails['credit']?>" autocomplete="off" />
+                </label>
 
                 <label for="txtSubTitle">Sub Title:
                     <input type="text" id="txtSubTitle" name="txtSubTitle" autocomplete="off" value="<?=stripcslashes($itineraryDetails['sub_title'])?>" />
