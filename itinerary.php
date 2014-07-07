@@ -393,14 +393,62 @@ if (!empty($_GET['id']))
             center: new google.maps.LatLng(latLngArray[0].lat,latLngArray[0].lng),
             zoom: 15,
             zoomControl: false,
-            mapTypeControlOptions: {
-                style: google.maps.MapTypeControlStyle.DROPDOWN_MENU,
-                position: google.maps.ControlPosition.TOP_CENTER
-            }
+            mapTypeControl: false
         };
 
         map = new google.maps.Map(document.getElementById("mapCanvas"),mapOptions);
         directionsDisplay.setMap(map);
+
+        var customControlDiv = document.createElement('div');
+        //var customMapControl = new mapViewControl(customControlDiv, map, 'Satellite');
+        var customMapControl = new mapViewControl(customControlDiv, map, 'Satellite');
+
+        //customControlDiv.index = 1;
+        map.controls[google.maps.ControlPosition.TOP_CENTER].push(customControlDiv);
+
+        /** @constructor */
+        function mapViewControl(controlDiv, map, label) {
+
+            // Set CSS styles for the DIV containing the control
+            // Setting padding to 5 px will offset the control
+            // from the edge of the map
+            controlDiv.style.padding = '10px';
+
+            // Set CSS for the control border
+            var controlUI = document.createElement('div');
+            controlUI.style.backgroundColor = 'white';
+            controlUI.style.borderStyle = 'solid';
+            controlUI.style.borderRadius = '5px';
+            controlUI.style.borderWidth = '1px';
+            controlUI.style.width = '100px';
+            controlUI.style.cursor = 'pointer';
+            controlUI.style.textAlign = 'center';
+            controlUI.title = 'Click to set the map to style';
+            controlDiv.appendChild(controlUI);
+
+            // Set CSS for the control interior
+            var controlText = document.createElement('div');
+            controlText.style.fontFamily = 'Helvetica,Arial,sans-serif';
+            controlText.style.fontSize = '12px';
+            controlText.style.paddingLeft = '4px';
+            controlText.style.paddingRight = '4px';
+            controlText.innerHTML = '<b>'+label+'</b>';
+            controlUI.appendChild(controlText);
+
+            //attah event listener
+            google.maps.event.addDomListener(controlUI, 'click', function() {
+                if (controlText.innerHTML === '<b>Satellite</b>')
+                {
+                    map.setMapTypeId(google.maps.MapTypeId.SATELLITE);
+                    controlText.innerHTML = '<b>Map</b>';
+                }
+                else
+                {
+                    map.setMapTypeId('map_style');
+                    controlText.innerHTML = '<b>Satellite</b>';
+                }
+            });
+        }
 
 
         var styles = [
@@ -719,6 +767,8 @@ if (!empty($_GET['id']))
     function markerInBounds(marker){
         return map.getBounds().contains(marker.getPosition());
     }
+
+
 
 
  });
