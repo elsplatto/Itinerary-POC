@@ -1,5 +1,5 @@
 <!doctype html>
-<html manifest="http://localhost/~jasontaikato/itinerary/manifests/itinerary-42-1404698138.manifest" class="no-js" lang="en">
+<html manifest="http://localhost/~jasontaikato/itinerary/manifests/itinerary-42-1404966143.manifest" class="no-js" lang="en">
     <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0" />
@@ -19,7 +19,7 @@
         <div class="swiper-slide white-slide"><div class="title"><h2>Fortune of War</h2></div><div class="contentHolder"><img src="http://localhost/~jasontaikato/itinerary/img/itineraries/locations/landscape/med/fortune-of-war.jpg" alt="" /><p>The Fortune of War dates from 1828 and is Sydney's oldest pub. Embodied in the history of Sydney, the bar was the first and last port of call for generations of sailors and the troops of the Australian Armed Forces who were to experience the 'fortune of the war' when they departed Sydney Cove to defend their country. Whilst retaining its old world charm, the hotel has built an enviable reputation, for providing a warm and traditional service in a cosy, heritage bar.</p></div></div><div class="swiper-slide white-slide"><div class="title"><h2>The Glenmore</h2></div><div class="contentHolder"><img src="http://localhost/~jasontaikato/itinerary/img/itineraries/locations/landscape/med/the-glenmore.jpg" alt="" /><p>The Glenmore Hotel was built by Brewers Tooth & Co in 1921 and has been an Aussie icon ever
 since. With its colonial old English charm and character, The Glenmore is a popular watering hole
 and has survived depressions, wars and plagues. The Glenmore is now one of Sydney's premier
-rooftop venues with 180 degree sweeping views of Sydney harbour and the CBD.</p></div></div><div class="swiper-slide white-slide"><div class="title"><h2>The Royal Oak</h2></div><div class="contentHolder"><img src="http://localhost/~jasontaikato/itinerary/img/itineraries/locations/landscape/med/the-royal-oaks.jpg" alt="" /><p>The Royal Oak is regarded as one of the finest pubs in Balmain. Famous for its food, the Oak prides itself on using fresh, seasonal and ethically sourced ingredients to produce delicious meals of generous portions. Balancing old world charm with modern day design, the Royal Oak is a popular destination for both locals and visitors alike and offers a great range of local and imported beers both on tap and in the bottle.</p></div></div>
+rooftop venues with 180 degree sweeping views of Sydney harbour and the CBD.</p></div></div><div class="swiper-slide white-slide"><div class="title"><h2>East Village Hotel</h2></div><div class="contentHolder"><img src="http://localhost/~jasontaikato/itinerary/img/itineraries/locations/landscape/med/east-village-hotel.jpg" alt="" /><p>The East Village Hotel is a pub with a penchant for craft beer and it's a look that works. The crowd here is made up of families, young professionals and well-dressed Balmain locals who split their time between the shady beer garden, dining room and the front bar. The heavy timber tables and fireplace have an old-fashioned and comforting feel, and anyone will feel welcome at The East Village.</p></div></div><div class="swiper-slide white-slide"><div class="title"><h2>The Royal Oak</h2></div><div class="contentHolder"><img src="http://localhost/~jasontaikato/itinerary/img/itineraries/locations/landscape/med/the-royal-oaks.jpg" alt="" /><p>The Royal Oak is regarded as one of the finest pubs in Balmain. Famous for its food, the Oak prides itself on using fresh, seasonal and ethically sourced ingredients to produce delicious meals of generous portions. Balancing old world charm with modern day design, the Royal Oak is a popular destination for both locals and visitors alike and offers a great range of local and imported beers both on tap and in the bottle.</p></div></div>
         </div>
     </div>
 </div>
@@ -124,7 +124,7 @@ $('body').on('mousedown touchstart', '.title', function(e)
     }
 });
 
-var latLngArray = [{lat: -33.86033790,lng: 151.20842680},{lat: -33.85877800,lng: 151.20729400},{lat: -33.85589400,lng: 151.18095200}];
+var latLngArray = [{lat: -33.86033790,lng: 151.20842680},{lat: -33.85877800,lng: 151.20729400},{lat: -33.85774500,lng: 151.19252900},{lat: -33.85589400,lng: 151.18095200}];
 
 var activeIndex = 0;
 var activeLat = latLngArray[activeIndex].lat;
@@ -148,8 +148,8 @@ var mainSwiper = new Swiper('.swiper-container',
         activeLng = latLngArray[activeIndex].lng;
         activeLatLng = new google.maps.LatLng(activeLat,activeLng);
         markerArray[swiper.previousIndex].setAnimation(null);
-        markerArray[swiper.previousIndex].setIcon('http://localhost/~jasontaikato/itinerary/img/marker-orange-hollow.png');
-        markerArray[activeIndex].setIcon('http://localhost/~jasontaikato/itinerary/img/marker-orange.png');
+        markerArray[swiper.previousIndex].setIcon('http://localhost/~jasontaikato/itinerary/img/marker-orange.png');
+        markerArray[activeIndex].setIcon('http://localhost/~jasontaikato/itinerary/img/marker-orange-hollow.png');
         markerArray[activeIndex].setAnimation(google.maps.Animation.BOUNCE);
         setTimeout(function() {
          markerArray[activeIndex].setAnimation(null);
@@ -293,15 +293,64 @@ function initialize() {
     mapOptions = {
         center: new google.maps.LatLng(latLngArray[0].lat,latLngArray[0].lng),
         zoom: 15,
-        zoomControl: true,
-        mapTypeControlOptions: {
-            style: google.maps.MapTypeControlStyle.DROPDOWN_MENU,
-            position: google.maps.ControlPosition.TOP_CENTER
-        }
+        zoomControl: false,
+        mapTypeControl: false
     };
 
+
     map = new google.maps.Map(document.getElementById("mapCanvas"),mapOptions);
-    directionsDisplay.setMap(map);
+        directionsDisplay.setMap(map);
+
+        var customControlDiv = document.createElement('div');
+        //var customMapControl = new mapViewControl(customControlDiv, map, 'Satellite');
+        var customMapControl = new mapViewControl(customControlDiv, map, 'Satellite');
+
+        //customControlDiv.index = 1;
+        map.controls[google.maps.ControlPosition.TOP_CENTER].push(customControlDiv);
+
+        /** @constructor */
+        function mapViewControl(controlDiv, map, label) {
+
+            // Set CSS styles for the DIV containing the control
+            // Setting padding to 5 px will offset the control
+            // from the edge of the map
+            controlDiv.style.padding = '10px';
+
+            // Set CSS for the control border
+            var controlUI = document.createElement('div');
+            controlUI.style.backgroundColor = 'white';
+            controlUI.style.borderStyle = 'solid';
+            controlUI.style.borderRadius = '5px';
+            controlUI.style.borderWidth = '1px';
+            controlUI.style.width = '100px';
+            controlUI.style.cursor = 'pointer';
+            controlUI.style.textAlign = 'center';
+            controlUI.title = 'Click to set the map to style';
+            controlDiv.appendChild(controlUI);
+
+            // Set CSS for the control interior
+            var controlText = document.createElement('div');
+            controlText.style.fontFamily = 'Helvetica,Arial,sans-serif';
+            controlText.style.fontSize = '12px';
+            controlText.style.paddingLeft = '4px';
+            controlText.style.paddingRight = '4px';
+            controlText.innerHTML = '<b>'+label+'</b>';
+            controlUI.appendChild(controlText);
+
+            //attah event listener
+            google.maps.event.addDomListener(controlUI, 'click', function() {
+                if (controlText.innerHTML === '<b>Satellite</b>')
+                {
+                    map.setMapTypeId(google.maps.MapTypeId.SATELLITE);
+                    controlText.innerHTML = '<b>Map</b>';
+                }
+                else
+                {
+                    map.setMapTypeId('map_style');
+                    controlText.innerHTML = '<b>Satellite</b>';
+                }
+            });
+        }
 
     var styles = [
         {
@@ -432,11 +481,11 @@ function initialize() {
 
             if (i === 0)
             {
-                icon = 'http://localhost/~jasontaikato/itinerary/img/marker-orange.png';
+                icon = 'http://localhost/~jasontaikato/itinerary/img/marker-orange-hollow.png';
             }
             else
             {
-                icon = 'http://localhost/~jasontaikato/itinerary/img/marker-orange-hollow.png';
+                icon = 'http://localhost/~jasontaikato/itinerary/img/marker-orange.png';
             }
 
             var marker = new google.maps.Marker({
@@ -459,6 +508,8 @@ function initialize() {
     google.maps.event.addListener(map, 'tilesloaded', function(evt) {
         $('#mapPreload').hide();
     });
+
+    fitBoundsToMarkers();
 
     function calcRoute() {
         var start, end;
@@ -590,6 +641,16 @@ function getUserLocation(el) {
         handleNoGeolocation(browserGeoLocationSupport);
         el.removeClass('loading');
     }
+}
+
+function fitBoundsToMarkers() {
+    var bounds = new google.maps.LatLngBounds();
+    for (var i=0;i<markerArray.length;i++)
+    {
+        bounds.extend( markerArray[i].getPosition() );
+    }
+
+    map.fitBounds(bounds);
 }
 
 function handleNoGeolocation(errorFlag) {

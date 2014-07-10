@@ -69,7 +69,7 @@ if (!empty($_GET['id']))
     <link rel="stylesheet" href="css/style.css" />
     <link rel="stylesheet" href="css/swiper.css" />
     <script src="js/vendor/modernizr.js"></script>
-    <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDcRjvvKaoJuT_-v4op_kWwsV5rwQEIRG8&sensor=true"></script>
+    <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDcRjvvKaoJuT_-v4op_kWwsV5rwQEIRG8&sensor=true&libraries=geometry"></script>
 </head>
 <body>
 <div id="mapPreload" class="overlay loading white"></div>
@@ -77,8 +77,32 @@ if (!empty($_GET['id']))
 <div id="swiperHolder" class="swiper-holder">
     <div id="swiperContainer" class="swiper-container">
         <div id="swiperWrapper" class="swiper-wrapper">
+
+            <div class="swiper-slide white-slide index">
+                <!--a class="toggle-up-down slide-up"></a-->
+                <div class="title" id="title-0">
+                    <h2><?=$itineraryDetail['title']?></h2>
+                    <a href="#" class="chevron next"></a>
+                    <span><?=$itineraryDetail['sub_title']?></span>
+                </div>
+                <div class="contentHolder">
+                    <ul class="indexList">
+                <?php
+                $k = 1;
+                foreach ($selectedLocations as $selectedLocation)
+                {
+                ?>
+                    <li><span><?=$k?></span><a href="#"><?=$selectedLocation['title']?></a></li>
+                <?php
+                    $k++;
+                }
+                ?>
+                    </ul>
+                </div>
+            </div>
+
             <?php
-            $j = 0;
+            $j = 1;
             foreach ($selectedLocations as $selectedLocation)
             {
             ?>
@@ -126,6 +150,7 @@ if (!empty($_GET['id']))
      var upperThreshold = (80 / 100) * screenHeight;
      var lowerThreshold = $('.title').outerHeight() + 40;
      var distanceCovered = 0;
+     var userZoomed = false;
 
      setContentHeight();
 
@@ -207,6 +232,19 @@ if (!empty($_GET['id']))
     });
 
 
+     $('.next').click(function(e){
+         e.preventDefault();
+         mainSwiper.swipeNext();
+     });
+
+     $('.indexList li').click(function(e){
+         e.preventDefault();
+         var index = $('li').index($(this));
+         mainSwiper.swipeTo(index+1);
+         console.log('index: ' + $('li').index($(this)));
+     })
+
+
      <?php
      $i = 0;
      echo 'var latLngArray = [';
@@ -244,27 +282,39 @@ if (!empty($_GET['id']))
         {
             activeIndex = swiper.activeIndex;
             activeSlide = $('.swiper-slide').eq(activeIndex);
-            activeLat = latLngArray[activeIndex].lat;
-            activeLng = latLngArray[activeIndex].lng;
-            activeLatLng = new google.maps.LatLng(activeLat,activeLng);
-            markerArray[swiper.previousIndex].setAnimation(null);
-            markerArray[swiper.previousIndex].setIcon('img/marker-orange-hollow.png');
-            markerArray[activeIndex].setIcon('img/marker-orange.png');
-            markerArray[activeIndex].setAnimation(google.maps.Animation.BOUNCE);
-            setTimeout(function() {
-             markerArray[activeIndex].setAnimation(null);
-        }, 750);
-            if (slideMode === 'up')
+
+            if (swiper.previousIndex > 0)
             {
-                mapRecenterTop(activeLatLng);
+                markerArray[swiper.previousIndex-1].setAnimation(null);
+                markerArray[swiper.previousIndex-1].setIcon('img/marker-orange.png');
             }
-            else if (slideMode === 'middled')
+
+            if (activeIndex > 0)
             {
-                mapRecenterTop(activeLatLng, calculateTargetPercent());
-            }
-            else
-            {
-                map.panTo(activeLatLng);
+                //activeIndex = swiper.activeIndex;
+
+                activeLat = latLngArray[activeIndex-1].lat;
+                activeLng = latLngArray[activeIndex-1].lng;
+                activeLatLng = new google.maps.LatLng(activeLat,activeLng);
+                //console.log('previous index: ' + swiper.previousIndex);
+
+                markerArray[activeIndex-1].setIcon('img/marker-orange-hollow.png');
+                markerArray[activeIndex-1].setAnimation(google.maps.Animation.BOUNCE);
+                setTimeout(function() {
+                    markerArray[activeIndex-1].setAnimation(null);
+                }, 750);
+                if (slideMode === 'up')
+                {
+                    mapRecenterTop(activeLatLng);
+                }
+                else if (slideMode === 'middled')
+                {
+                    mapRecenterTop(activeLatLng, calculateTargetPercent());
+                }
+                else
+                {
+                    map.panTo(activeLatLng);
+                }
             }
         }
     });
@@ -405,6 +455,12 @@ if (!empty($_GET['id']))
 
         //customControlDiv.index = 1;
         map.controls[google.maps.ControlPosition.TOP_CENTER].push(customControlDiv);
+
+
+        google.maps.event.addListener(map, 'zoom_changed', function() {
+            userZoomed = true;
+            //console.log('zoomed: ' + userZoomed);
+        })
 
         /** @constructor */
         function mapViewControl(controlDiv, map, label) {
@@ -578,14 +634,7 @@ if (!empty($_GET['id']))
                 var latLng = new google.maps.LatLng(latLngArray.lat,latLngArray.lng);
                 var icon;
 
-                if (i === 0)
-                {
-                    icon = 'img/marker-orange.png';
-                }
-                else
-                {
-                    icon = 'img/marker-orange-hollow.png';
-                }
+                icon = 'img/marker-orange.png';
 
                 var marker = new google.maps.Marker({
                     index: i,
@@ -598,7 +647,7 @@ if (!empty($_GET['id']))
 
                 google.maps.event.addListener(marker, 'click', function(){
                     //putting true in callback parameter allows icon change and animations to execute at emd of slide animation
-                    mainSwiper.swipeTo(marker.index, 300,true);
+                    mainSwiper.swipeTo((marker.index+1), 300,true);
                 });
 
             }(latLngArray[i]));
