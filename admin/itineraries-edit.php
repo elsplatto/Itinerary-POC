@@ -4,6 +4,7 @@ include '../includes/db.php';
 include 'includes/global-admin-functions.php';
 assessLogin($securityArrAuthor);
 
+$needsMaps = true;
 if (!empty($_GET['id']))
 {
     $itineraryId = $_GET['id'];
@@ -43,9 +44,9 @@ function getItinerary($id, $DB_SERVER, $DB_USERNAME, $DB_PASSWORD, $DB_DATABASE)
 function getLocations($DB_SERVER, $DB_USERNAME, $DB_PASSWORD, $DB_DATABASE)
 {
     $mysqli = new mysqli($DB_SERVER, $DB_USERNAME, $DB_PASSWORD, $DB_DATABASE);
-    $stmt = $mysqli->prepare('SELECT id, title, image_landscape, tags FROM itinerary_locations WHERE is_live = 1');
+    $stmt = $mysqli->prepare('SELECT id, title, image_landscape, tags, lat, lng FROM itinerary_locations WHERE is_live = 1');
     $stmt->execute();
-    $stmt->bind_result($id, $title, $image_landscape, $tags);
+    $stmt->bind_result($id, $title, $image_landscape, $tags, $lat, $lng);
 
     $results = array();
     $i = 0;
@@ -55,6 +56,8 @@ function getLocations($DB_SERVER, $DB_USERNAME, $DB_PASSWORD, $DB_DATABASE)
         $results[$i]['title'] = $title;
         $results[$i]['image_landscape'] = $image_landscape;
         $results[$i]['tags'] = $tags;
+        $results[$i]['lat'] = $lat;
+        $results[$i]['lng'] = $lng;
         $i++;
     }
     $stmt->close();
@@ -65,10 +68,10 @@ function getLocations($DB_SERVER, $DB_USERNAME, $DB_PASSWORD, $DB_DATABASE)
 function getSelectedLocation($id,$DB_SERVER, $DB_USERNAME, $DB_PASSWORD, $DB_DATABASE)
 {
     $mysqli = new mysqli($DB_SERVER, $DB_USERNAME, $DB_PASSWORD, $DB_DATABASE);
-    $stmt = $mysqli->prepare('SELECT il.id, il.title, il.image_landscape, il.tags FROM itinerary_locations il JOIN itinerary_itinerary_location iil ON iil.itinerary_location_id = il.id WHERE iil.itinerary_id = ? ORDER BY iil.sequence');
+    $stmt = $mysqli->prepare('SELECT il.id, il.title, il.image_landscape, il.tags, il.lat, il.lng, iil.distance FROM itinerary_locations il JOIN itinerary_itinerary_location iil ON iil.itinerary_location_id = il.id WHERE iil.itinerary_id = ? ORDER BY iil.sequence');
     $stmt->bind_param('i', $id);
     $stmt->execute();
-    $stmt->bind_result($id, $title, $image_landscape, $tags);
+    $stmt->bind_result($id, $title, $image_landscape, $tags, $lat, $lng, $distance);
     $results = array();
     $i = 0;
     while($stmt->fetch())
@@ -76,8 +79,10 @@ function getSelectedLocation($id,$DB_SERVER, $DB_USERNAME, $DB_PASSWORD, $DB_DAT
         $results[$i]['id'] = $id;
         $results[$i]['title'] = $title;
         $results[$i]['image_landscape'] = $image_landscape;
-
         $results[$i]['tags'] = $tags;
+        $results[$i]['lat'] = $lat;
+        $results[$i]['lng'] = $lng;
+        $results[$i]['distance'] = $distance;
         $i++;
     }
     $stmt->close();
@@ -163,7 +168,7 @@ $selectedLocations = getSelectedLocation($itineraryId, $DB_SERVER, $DB_USERNAME,
                             foreach ($selectedLocations as $selectedLocation)
                             {
                             ?>
-                                <li data-itinerary-location-selected data-location-id="<?=$selectedLocation['id']?>" data-itinerary-id="<?=$itineraryId?>" data-tags="<?=$selectedLocation['tags']?>">
+                                <li data-itinerary-location-selected data-location-id="<?=$selectedLocation['id']?>" data-itinerary-id="<?=$itineraryId?>" data-tags="<?=$selectedLocation['tags']?>" data-lat="<?=$selectedLocation['lat']?>" data-lng="<?=$selectedLocation['lng']?>" data-distance="<?=$selectedLocation['distance']?>">
                                     <div class="tile">
                                         <div class="textholder">
                                             <h5><?=$selectedLocation['title']?></h5>
@@ -190,7 +195,7 @@ $selectedLocations = getSelectedLocation($itineraryId, $DB_SERVER, $DB_USERNAME,
                                 if (!$tileMatch)
                                 {
                                 ?>
-                                <li data-location-id="<?=$location['id']?>" data-itinerary-id="<?=$itineraryId?>" data-tags="<?=$location['tags']?>">
+                                <li data-location-id="<?=$location['id']?>" data-itinerary-id="<?=$itineraryId?>" data-tags="<?=$location['tags']?>" data-lat="<?=$location['lat']?>" data-lng="<?=$location['lng']?>" data-distance="0">
                                     <div class="tile">
                                         <div class="textholder">
                                             <h5><?=$location['title']?></h5>
@@ -206,17 +211,19 @@ $selectedLocations = getSelectedLocation($itineraryId, $DB_SERVER, $DB_USERNAME,
                             ?>
                         </ul>
                     </div>
-
                 </div>
-
-
 
                 <label for="chkIsLive">Live:
                     <input type="checkbox" id="chkIsLive" name="chkIsLive" value="1" <?=$itineraryDetails['is_live'] == 1 ? 'checked="checked"' : '' ?>/>
                 </label>
 
-                <input type="submit" value="Submit" class="button" />&nbsp;<a href="itineraries-list.php" class="cancel">Cancel</a>
+                <input id="btnSubmitItinerary" type="submit" value="Submit" class="button" />&nbsp;<a href="itineraries-list.php" class="cancel">Cancel</a>
             </form>
+
+
+
+
+            <div id="mapCanvas" style="width: 100%; height: 500px"></div>
         </div>
     </div>
 </section>
@@ -230,7 +237,7 @@ include 'includes/footer.php';
 
 $(function() {
 
-
+    var locationArray = [];
 
     $('.tileFilter').keyup(function(e) {
 
@@ -292,11 +299,95 @@ $(function() {
         });
     });
 
+    var isStartFirstTile = false;
+    var isStartLastTile = false;
+
+    var isEndFirstTile = false;
+    var isEndLastTile = false;
+
+    var startPreviousSibling = null;
+    var startNextSibling = null;
+
+    var endPreviousSibling = null;
+    var endNextSibling = null;
+
+    function resetTileVars()
+    {
+        isStartFirstTile = false;
+        isStartLastTile = false;
+        isEndFirstTile = false;
+        isEndLastTile = false;
+        startPreviousSibling = null;
+        startNextSibling = null;
+        endPreviousSibling = null;
+        endNextSibling = null;
+    }
+
     $('.locationTiles .tileList').sortable({
         containment: 'parent',
+        placeholder: 'placeholder',
+        start: function (event, ui) {
+            console.log('============================Start============================');
+            console.dir(event);
+            console.dir(ui);
+            startPreviousSibling = ui.item.context.previousElementSibling;
+            startNextSibling = ui.item.context.nextElementSibling;
+
+            if (startNextSibling.className.indexOf('placeholder') > -1)
+            {
+                startNextSibling = startNextSibling.nextElementSibling;
+            }
+
+            if (startNextSibling === null)
+            {
+                isStartLastTile = true;
+                console.log('last tile selected');
+            }
+
+            if (startPreviousSibling === null) {
+                isStartFirstTile = true;
+                console.log('first tile selected');
+            }
+            //console.dir(previousSibling);
+            //console.dir(nextSibling);
+
+            //console.log('Previous: ' + previousSibling.innerText);
+            //console.log('Next: ' + nextSibling.innerText);
+
+        },
         update: function (event, ui) {
-            //console.dir(event);
-            //console.dir(ui);
+            console.log('===========================Update=============================');
+            console.dir(ui);
+
+            endPreviousSibling = ui.item.context.previousElementSibling;
+            endNextSibling = ui.item.context.nextElementSibling;
+
+            var startPrevElLatLng = 0, startNextElLatLng = 0, endPrevElLatLng = 0, endNextElLatLng = 0;
+            var elLatLng = getDistance(ui.item.attr('data-lat'), ui.item.attr('data-lng'));
+            var elDistance = 0;
+
+            if (endNextSibling === null)
+            {
+                isEndLastTile = true;
+                console.log('last tile now');
+            }
+
+            if (endPreviousSibling === null) {
+                isEndFirstTile = true;
+                console.log('first tile now');
+            }
+
+            if (isEndFirstTile)
+            {
+                ui.item.attr('data-distance', '0');
+            }
+            else
+            {
+                endPrevElLatLng = new google.maps.LatLng(endPreviousSibling.attr('data-lat'), endPreviousSibling.attr('data-lng'));
+                elDistance = google.maps.geometry.spherical.computeDistanceBetween (endPrevElLatLng, elLatLng);
+                ui.item.attr('data-distance', elDistance);
+            }
+
             var isSelected = ui.item.context.dataset.hasOwnProperty('itineraryLocationSelected');
             if (isSelected)
             {
@@ -305,8 +396,8 @@ $(function() {
                     //console.log('index['+$(this).index()+']');
                     var itinerary_id = $(this).attr('data-itinerary-id');
                     var location_id = $(this).attr('data-location-id');
-                    var item_index = $(this).index() + 1;
-                    //console.log('itinerary_id['+itinerary_id+']location_id['+location_id+']sequence['+item_index+']');
+                    var item_index = i + 1;
+                    var distance = $(this).attr('data-distance');
                     $.ajax({
                         type: 'POST',
                         url: 'update-location-tile-order.php',
@@ -322,6 +413,8 @@ $(function() {
             }
         }
     });
+
+
 
     $('.insertTag').click(function(e) {
         e.preventDefault();
@@ -344,6 +437,32 @@ $(function() {
         }
         target.val(target.val() + tagHTML);
     });
+
+    var map;
+    var sydney = new google.maps.LatLng(-33.861858,151.210546);
+
+    initialize();
+    function initialize() {
+        var mapOptions = {
+            zoom: 10,
+            center: sydney,
+            streetViewControl: false,
+            mapTypeControlOptions: {
+                mapTypeIds: [google.maps.MapTypeId.ROADMAP],
+                style: google.maps.MapTypeControlStyle.DROPDOWN_MENU
+            }
+        };
+        map = new google.maps.Map(document.getElementById('mapCanvas'),
+            mapOptions);
+
+        function getDistance(loc1, loc2)
+        {
+            var distance = new google.maps.latLng(loc1,loc2);
+            return distance;
+        }
+
+
+    }
 });
 </script>
 <?php

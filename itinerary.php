@@ -241,7 +241,6 @@ if (!empty($_GET['id']))
          e.preventDefault();
          var index = $('li').index($(this));
          mainSwiper.swipeTo(index+1);
-         console.log('index: ' + $('li').index($(this)));
      })
 
 
@@ -292,11 +291,11 @@ if (!empty($_GET['id']))
             if (activeIndex > 0)
             {
                 //activeIndex = swiper.activeIndex;
+                map.setZoom(17);
 
                 activeLat = latLngArray[activeIndex-1].lat;
                 activeLng = latLngArray[activeIndex-1].lng;
                 activeLatLng = new google.maps.LatLng(activeLat,activeLng);
-                //console.log('previous index: ' + swiper.previousIndex);
 
                 markerArray[activeIndex-1].setIcon('img/marker-orange-hollow.png');
                 markerArray[activeIndex-1].setAnimation(google.maps.Animation.BOUNCE);
@@ -315,6 +314,10 @@ if (!empty($_GET['id']))
                 {
                     map.panTo(activeLatLng);
                 }
+            }
+            else if (activeIndex === 0)
+            {
+                fitBoundsToMarkers();
             }
         }
     });
@@ -628,6 +631,10 @@ if (!empty($_GET['id']))
 
         calcRoute();
 
+        var prevLatLng = 0;
+        var prevLoc = 0;
+        var distance = 0;
+
         for (i=0; i<latLngArray.length; i++)
         {
             (function(latLngArray){
@@ -635,6 +642,17 @@ if (!empty($_GET['id']))
                 var icon;
 
                 icon = 'img/marker-orange.png';
+
+                //var prevLatLng = new google.maps.LatLng()
+
+                if (i > 0)
+                {
+                    //console.log(prevLatLng.lat);
+                    //console.log(latLngArray.lat);
+                    prevLoc = new google.maps.LatLng(prevLatLng.lat, prevLatLng.lng);
+                    distance = google.maps.geometry.spherical.computeDistanceBetween (prevLoc, latLng);
+                    //console.log('distance: ' + distance);
+                }
 
                 var marker = new google.maps.Marker({
                     index: i,
@@ -651,6 +669,7 @@ if (!empty($_GET['id']))
                 });
 
             }(latLngArray[i]));
+            prevLatLng = latLngArray[i];
         }
 
         google.maps.event.addListener(map, 'tilesloaded', function(evt) {

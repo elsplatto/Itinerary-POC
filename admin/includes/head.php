@@ -35,7 +35,7 @@ if ($needsConfirmRemove)
 if ($needsMaps)
 {
 ?>
-<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDcRjvvKaoJuT_-v4op_kWwsV5rwQEIRG8&sensor=true"></script>
+<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDcRjvvKaoJuT_-v4op_kWwsV5rwQEIRG8&sensor=true&libraries=geometry"></script>
 <?php
 }
 ?>
