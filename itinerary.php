@@ -150,7 +150,7 @@ if (!empty($_GET['id']))
      var upperThreshold = (80 / 100) * screenHeight;
      var lowerThreshold = $('.title').outerHeight() + 40;
      var distanceCovered = 0;
-     var userZoomed = false;
+     var firstSlideEventFired = false;
 
      setContentHeight();
 
@@ -290,8 +290,11 @@ if (!empty($_GET['id']))
 
             if (activeIndex > 0)
             {
-                //activeIndex = swiper.activeIndex;
-                map.setZoom(17);
+                if (!firstSlideEventFired)
+                {
+                    map.setZoom(17);
+                    firstSlideEventFired = true;
+                }
 
                 activeLat = latLngArray[activeIndex-1].lat;
                 activeLng = latLngArray[activeIndex-1].lng;
@@ -318,6 +321,7 @@ if (!empty($_GET['id']))
             else if (activeIndex === 0)
             {
                 fitBoundsToMarkers();
+                firstSlideEventFired = false;
             }
         }
     });
@@ -453,17 +457,10 @@ if (!empty($_GET['id']))
         directionsDisplay.setMap(map);
 
         var customControlDiv = document.createElement('div');
-        //var customMapControl = new mapViewControl(customControlDiv, map, 'Satellite');
         var customMapControl = new mapViewControl(customControlDiv, map, 'Satellite');
 
         //customControlDiv.index = 1;
         map.controls[google.maps.ControlPosition.TOP_CENTER].push(customControlDiv);
-
-
-        google.maps.event.addListener(map, 'zoom_changed', function() {
-            userZoomed = true;
-            //console.log('zoomed: ' + userZoomed);
-        })
 
         /** @constructor */
         function mapViewControl(controlDiv, map, label) {
@@ -633,31 +630,37 @@ if (!empty($_GET['id']))
 
         var prevLatLng = 0;
         var prevLoc = 0;
-        var distance = 0;
 
         for (i=0; i<latLngArray.length; i++)
         {
             (function(latLngArray){
                 var latLng = new google.maps.LatLng(latLngArray.lat,latLngArray.lng);
                 var icon;
-
+                var distance = 0;
                 icon = 'img/marker-orange.png';
-
-                //var prevLatLng = new google.maps.LatLng()
-
                 if (i > 0)
                 {
-                    //console.log(prevLatLng.lat);
-                    //console.log(latLngArray.lat);
                     prevLoc = new google.maps.LatLng(prevLatLng.lat, prevLatLng.lng);
                     distance = google.maps.geometry.spherical.computeDistanceBetween (prevLoc, latLng);
-                    //console.log('distance: ' + distance);
                 }
+
+                var distanceHTML = '';
+                if (i == 0)
+                {
+                    distanceHTML = '<div class="distance">Start</div>';
+                }
+                else
+                {
+                    distanceHTML = '<div class="distance">'+formatDistance(Math.round(distance))+'</div>';
+                }
+
+                $('.indexList li').eq(i).append(distanceHTML);
 
                 var marker = new google.maps.Marker({
                     index: i,
                     position: latLng,
                     icon: icon,
+                    distance: distance,
                     map: map
                 });
 
@@ -677,6 +680,24 @@ if (!empty($_GET['id']))
         });
 
         fitBoundsToMarkers();
+
+        function formatDistance(m)
+        {
+            console.log(m);
+            var convertedVal = m;
+            if (convertedVal > 1000)
+            {
+                convertedVal = m/1000;
+                convertedVal = convertedVal.toFixed(2);
+                convertedVal = convertedVal.toString() + ' km';
+                console.log(convertedVal);
+            }
+            else
+            {
+                convertedVal = convertedVal.toString() + ' m';
+            }
+            return convertedVal;
+        }
 
         function calcRoute() {
             var start, end;
@@ -707,7 +728,6 @@ if (!empty($_GET['id']))
             });
         }
     }
-
 
     function calculateNewTargetPosY(p)
     {

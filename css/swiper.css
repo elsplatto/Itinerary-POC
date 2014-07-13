@@ -373,17 +373,26 @@ body {
         font-size: 10px;
         color: white;
         z-index: 10;
-        position: relative;
-        top: -2px;
+        position: absolute;
+        top: 14px;
         width: 12px;
         text-align: center;
         display: inline-block; }
+      .contentHolder ul li .distance {
+        font-size: 12px;
+        float: right;
+        color: #333333;
+        position: relative;
+        top: 3px;
+        white-space: nowrap;
+        margin-right: 15px; }
       .contentHolder ul li a {
         font-size: 12px;
         display: inline-block;
         text-decoration: none;
         color: #333333;
-        padding-left: 10px; }
+        padding-left: 20px;
+        max-width: 75%; }
 
 #mapCanvas .gm-style .gm-style-cc span, .gm-style .gm-style-cc a, .gm-style .gm-style-mtc div {
   padding: 8px 8px !important; }

@@ -299,94 +299,49 @@ $(function() {
         });
     });
 
-    var isStartFirstTile = false;
-    var isStartLastTile = false;
-
-    var isEndFirstTile = false;
-    var isEndLastTile = false;
-
-    var startPreviousSibling = null;
-    var startNextSibling = null;
-
-    var endPreviousSibling = null;
-    var endNextSibling = null;
-
-    function resetTileVars()
-    {
-        isStartFirstTile = false;
-        isStartLastTile = false;
-        isEndFirstTile = false;
-        isEndLastTile = false;
-        startPreviousSibling = null;
-        startNextSibling = null;
-        endPreviousSibling = null;
-        endNextSibling = null;
-    }
-
     $('.locationTiles .tileList').sortable({
         containment: 'parent',
         placeholder: 'placeholder',
-        start: function (event, ui) {
-            console.log('============================Start============================');
-            console.dir(event);
-            console.dir(ui);
-            startPreviousSibling = ui.item.context.previousElementSibling;
-            startNextSibling = ui.item.context.nextElementSibling;
-
-            if (startNextSibling.className.indexOf('placeholder') > -1)
-            {
-                startNextSibling = startNextSibling.nextElementSibling;
-            }
-
-            if (startNextSibling === null)
-            {
-                isStartLastTile = true;
-                console.log('last tile selected');
-            }
-
-            if (startPreviousSibling === null) {
-                isStartFirstTile = true;
-                console.log('first tile selected');
-            }
-            //console.dir(previousSibling);
-            //console.dir(nextSibling);
-
-            //console.log('Previous: ' + previousSibling.innerText);
-            //console.log('Next: ' + nextSibling.innerText);
-
-        },
         update: function (event, ui) {
-            console.log('===========================Update=============================');
-            console.dir(ui);
 
-            endPreviousSibling = ui.item.context.previousElementSibling;
-            endNextSibling = ui.item.context.nextElementSibling;
+            //create array of elements
+            /*var selectedLocations = $('#locationTileList li[data-itinerary-location-selected]');
+            var origin = [];
+            var destinations = [];
 
-            var startPrevElLatLng = 0, startNextElLatLng = 0, endPrevElLatLng = 0, endNextElLatLng = 0;
-            var elLatLng = getDistance(ui.item.attr('data-lat'), ui.item.attr('data-lng'));
-            var elDistance = 0;
-
-            if (endNextSibling === null)
+            var locArrayLength = selectedLocations.length;
+            if (locArrayLength > 0)
             {
-                isEndLastTile = true;
-                console.log('last tile now');
+                for (var i=0;i<locArrayLength;i++)
+                {
+                    if (i == 0)
+                    {
+                        origin.push(new google.map.LatLng(selectedLocations[i].dataset.lat,selectedLocations[i].dataset.lng));
+                    }
+                    else
+                    {
+                        destinations.push(new google.map.LatLng(selectedLocations[i].dataset.lat,selectedLocations[i].dataset.lng));
+                    }
+                }
+
+                console.dir(origin);
+                console.dir(destinations);
+
+                var service = new google.maps.DistanceMatrixService();
+                service.getDistanceMatrix(
+                {
+                    origins: [origin],
+                    destinations: [destinations],
+                    travelMode: google.maps.TravelMode.WALKING
+                }, callback);
             }
 
-            if (endPreviousSibling === null) {
-                isEndFirstTile = true;
-                console.log('first tile now');
-            }
+            function callback(response, status) {
+                // See Parsing the Results for
+                // the basics of a callback function.
+                console.log(response);
+            }*/
 
-            if (isEndFirstTile)
-            {
-                ui.item.attr('data-distance', '0');
-            }
-            else
-            {
-                endPrevElLatLng = new google.maps.LatLng(endPreviousSibling.attr('data-lat'), endPreviousSibling.attr('data-lng'));
-                elDistance = google.maps.geometry.spherical.computeDistanceBetween (endPrevElLatLng, elLatLng);
-                ui.item.attr('data-distance', elDistance);
-            }
 
             var isSelected = ui.item.context.dataset.hasOwnProperty('itineraryLocationSelected');
             if (isSelected)
