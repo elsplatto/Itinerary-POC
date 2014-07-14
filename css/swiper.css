@@ -394,6 +394,47 @@ body {
         padding-left: 20px;
         max-width: 75%; }
 
+.markerLabels {
+  color: white;
+  width: 16px;
+  height: 21px;
+  text-align: center; }
+  .markerLabels:before {
+    content: "";
+    z-index: -1;
+    position: absolute;
+    width: 16px;
+    height: 21px;
+    top: 0px;
+    left: 0px;
+    background-image: url("img/sprite.png");
+    background-position: 0px -58px; }
+
+.markerActive {
+  color: black;
+  width: 16px;
+  height: 21px;
+  text-align: center; }
+  .markerActive:before {
+    content: "";
+    z-index: -1;
+    position: absolute;
+    width: 16px;
+    height: 21px;
+    top: 0px;
+    left: 0px;
+    background-image: url("img/sprite.png");
+    background-position: -23px -58px; }
+
+.markerLabels.active {
+  color: black; }
+  .markerLabels.active:before {
+    background-position: -23px -58px; }
+
+.markerLabelActive {
+  color: black;
+  z-index: 10000; }
+
 #mapCanvas .gm-style .gm-style-cc span, .gm-style .gm-style-cc a, .gm-style .gm-style-mtc div {
   padding: 8px 8px !important; }
   #mapCanvas .gm-style .gm-style-cc span div, .gm-style .gm-style-cc a div, .gm-style .gm-style-mtc div div {
