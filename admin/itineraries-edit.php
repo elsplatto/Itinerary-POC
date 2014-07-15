@@ -304,43 +304,6 @@ $(function() {
         placeholder: 'placeholder',
         update: function (event, ui) {
 
-            //create array of elements
-            /*var selectedLocations = $('#locationTileList li[data-itinerary-location-selected]');
-            var origin = [];
-            var destinations = [];
-
-            var locArrayLength = selectedLocations.length;
-            if (locArrayLength > 0)
-            {
-                for (var i=0;i<locArrayLength;i++)
-                {
-                    if (i == 0)
-                    {
-                        origin.push(new google.map.LatLng(selectedLocations[i].dataset.lat,selectedLocations[i].dataset.lng));
-                    }
-                    else
-                    {
-                        destinations.push(new google.map.LatLng(selectedLocations[i].dataset.lat,selectedLocations[i].dataset.lng));
-                    }
-                }
-
-                console.dir(origin);
-                console.dir(destinations);
-
-                var service = new google.maps.DistanceMatrixService();
-                service.getDistanceMatrix(
-                {
-                    origins: [origin],
-                    destinations: [destinations],
-                    travelMode: google.maps.TravelMode.WALKING
-                }, callback);
-            }
-
-            function callback(response, status) {
-                // See Parsing the Results for
-                // the basics of a callback function.
-                console.log(response);
-            }*/
 
 
             var isSelected = ui.item.context.dataset.hasOwnProperty('itineraryLocationSelected');

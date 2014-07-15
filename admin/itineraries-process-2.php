@@ -24,7 +24,7 @@ else
 
 
 
-/*if (strlen($error_msg) > 0)
+if (strlen($error_msg) > 0)
 {
     if ($itineraryId > 0)
     {
@@ -45,5 +45,5 @@ else
     {
         header('Location: itineraries-list.php?new_id='.$new_id.'&success_msg=Itinerary successfully added');
     }
-}*/
+}
 ?>

@@ -67,13 +67,40 @@ if (!empty($_GET['id']))
         <title>Itinerary - <?=$itineraryDetail['title']?></title>
         <link rel="stylesheet" href="css/idangerous.swiper.css" />
         <link rel="stylesheet" href="css/style.css" />
-        <link rel="stylesheet" href="css/swiper.css" />
         <script src="js/vendor/modernizr.js"></script>
         <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDcRjvvKaoJuT_-v4op_kWwsV5rwQEIRG8&sensor=true&libraries=geometry"></script>
     </head>
     <body>
+    <div id="introContainer" class="introContainer">
+        <div id="introScreen" class="introScreen" style="background-image: url('img/itineraries/portrait/<?=$itineraryDetail['image_portrait']?>')">
+
+        </div>
+
+        <div id="introContent" class="introContent">
+            <div id="introInner" class="introInner">
+                <a href="index.php" class="chevron back white">Back to list page</a>
+                <h2><?=$itineraryDetail['title']?></h2>
+                <h3><?=$itineraryDetail['sub_title']?></h3>
+                <?=stripcslashes($itineraryDetail['description'])?>
+            </div>
+        </div>
+        <div id="bottomContainer" class="bottomContainer">
+            <div id="blurredTop" class="blurredTop"></div>
+            <div class="contentTop">
+            </div>
+            <div class="contentArea">
+                <div class="contentInner">
+                    <a href="#" class="chevron toMaps">Go to map</a>
+                    <h4><?=$itineraryDetail['title']?></h4>
+                    <h5><?=$itineraryDetail['sub_title']?></h5>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div id="mapPreload" class="overlay loading white"></div>
     <div class="get-position"><a href="#"></a></div>
+    <div class="back-to-intro"><a href="#" class="chevron back white">Back to intro screen</a></div>
     <div id="swiperHolder" class="swiper-holder">
         <div id="swiperContainer" class="swiper-container">
             <div id="swiperWrapper" class="swiper-wrapper">
@@ -141,12 +168,76 @@ if (!empty($_GET['id']))
 
     $(function(){
 
+        var screenHeight = $(document).height();
+        var screenWidth = $(document).width();
+        var bottomElementHeight = $('#bottomContainer').outerHeight();
+        var blurredTopHeight = $('#blurredTop').outerHeight();
+        var introContentHeight = (screenHeight - bottomElementHeight) + blurredTopHeight;
+        $('#introContent').css({
+            height: introContentHeight
+        });
+
+        $('.toMaps').click(function(e){
+            e.preventDefault();
+            $('#introContainer').css({position: 'absolute'});
+            $('#introContainer').animate({
+                left: "-"+screenWidth+""
+            }, 500, function(){
+                $('#introContainer').css({
+                    display: 'none'
+                })
+            });
+        });
+
+
+        $('.back-to-intro').click(function(e) {
+            e.preventDefault();
+            $('#introContainer').css({display: 'block'});
+            $('#introContainer').animate({
+                left: 0
+            }, 500, function(){
+                $('#introContainer').css({
+                    position: 'fixed'
+                })
+            });
+        })
+
+        $('#introContent').scroll(function(e){
+            e.preventDefault();
+            var pos = $(this).scrollTop();
+            if (pos > 0)
+            {
+                $('#introScreen').addClass('blur');
+            }
+            else if (pos <= 0)
+            {
+                $('#introScreen').removeClass('blur');
+            }
+        });
+
+        function doOnOrientationChange()
+        {
+            mainSwiper.reInit()
+            /*switch(window.orientation)
+            {
+                case -90:
+                case 90:
+                    alert('landscape');
+                    break;
+                default:
+                    alert('portrait');
+                    break;
+            }*/
+        }
+
+        window.addEventListener('orientationchange', doOnOrientationChange);
+
+
         var dragStartTime = 0;
         var dragStartY = 0;
         var dragHolderDiff = 0;
         var originalDistanceFromBottom = 0;
         var holderHeight = $('#swiperHolder').outerHeight();
-        var screenHeight = $(document).height();
         var distanceFromBottom = 0;
         var upperThreshold = (80 / 100) * screenHeight;
         var lowerThreshold = $('.title').outerHeight() + 40;
@@ -265,65 +356,65 @@ if (!empty($_GET['id']))
         ?>
 
         var activeIndex = 0;
-        var activeLat = latLngArray[activeIndex].lat;
-        var activeLng = latLngArray[activeIndex].lng;
-        var activeLatLng = new google.maps.LatLng(activeLat,activeLng);
+        var activeLat = 0;
+        var activeLng = 0;
+        var activeLatLng = 0;
         var activeSlide = $('.swiper-slide').eq(activeIndex);
         var previousIndex = 0;
         var slideMode = 'down';
 
         var mainSwiper = new Swiper('.swiper-container',
+        {
+            pagination: '.pagination',
+            paginationClickable: true,
+            centeredSlides: true,
+            slidesPerView: 'auto',
+            resizeReInit: true,
+            queueEndCallbacks: true,
+            onSlideChangeEnd: function(swiper)
             {
-                pagination: '.pagination',
-                paginationClickable: true,
-                centeredSlides: true,
-                slidesPerView: 'auto',
-                resizeReInit: true,
-                queueEndCallbacks: true,
-                onSlideChangeEnd: function(swiper)
+                activeIndex = swiper.activeIndex;
+                previousIndex = swiper.previousIndex;
+                activeSlide = $('.swiper-slide').eq(activeIndex);
+
+                if (previousIndex > 0)
                 {
-                    activeIndex = swiper.activeIndex;
-                    previousIndex = swiper.previousIndex;
-                    activeSlide = $('.swiper-slide').eq(activeIndex);
+                    markerArray[previousIndex-1].set('labelClass','markerLabels');
+                }
 
-
-                    if (previousIndex > 0)
+                if (activeIndex > 0)
+                {
+                    //change class on marker
+                    markerArray[activeIndex-1].set('labelClass','markerActive');
+                    if (!firstSlideEventFired)
                     {
-                        markerArray[previousIndex-1].set('labelClass','markerLabels');
+                        map.setZoom(17);
+                        firstSlideEventFired = true;
                     }
-
-                    if (activeIndex > 0)
+                    activeLat = latLngArray[activeIndex-1].lat;
+                    activeLng = latLngArray[activeIndex-1].lng;
+                    activeLatLng = new google.maps.LatLng(activeLat,activeLng);
+                    if (slideMode === 'up')
                     {
-                        //change class on marker
-                        markerArray[activeIndex-1].set('labelClass','markerActive');
-                        if (!firstSlideEventFired)
-                        {
-                            map.setZoom(17);
-                            firstSlideEventFired = true;
-                        }
-                        activeLat = latLngArray[activeIndex-1].lat;
-                        activeLng = latLngArray[activeIndex-1].lng;
-                        activeLatLng = new google.maps.LatLng(activeLat,activeLng);
-                        if (slideMode === 'up')
-                        {
-                            mapRecenterTop(activeLatLng);
-                        }
-                        else if (slideMode === 'middled')
-                        {
-                            mapRecenterTop(activeLatLng, calculateTargetPercent());
-                        }
-                        else
-                        {
-                            map.panTo(activeLatLng);
-                        }
+                        mapRecenterTop(activeLatLng);
                     }
-                    else if (activeIndex === 0)
+                    else if (slideMode === 'middled')
                     {
-                        fitBoundsToMarkers();
-                        firstSlideEventFired = false;
+                        mapRecenterTop(activeLatLng, calculateTargetPercent());
+                    }
+                    else
+                    {
+                        map.panTo(activeLatLng);
                     }
                 }
-            });
+                else if (activeIndex === 0)
+                {
+                    fitBoundsToMarkers();
+                    firstSlideEventFired = false;
+                }
+            }
+        });
+
 
         $('.get-position a').click(function(e) {
             e.preventDefault();
@@ -428,7 +519,6 @@ if (!empty($_GET['id']))
 
         var map;
         var markerArray = [];
-        var markerLabelArray = [];
         var directionsDisplay;
         var directionsService = new google.maps.DirectionsService();
 
@@ -448,7 +538,8 @@ if (!empty($_GET['id']))
                 center: new google.maps.LatLng(latLngArray[0].lat,latLngArray[0].lng),
                 zoom: 15,
                 zoomControl: false,
-                mapTypeControl: false
+                mapTypeControl: false,
+                streetViewControl: false
             };
 
             map = new google.maps.Map(document.getElementById("mapCanvas"),mapOptions);
@@ -652,18 +743,6 @@ if (!empty($_GET['id']))
                     }
 
                     $('.indexList li').eq(i).append(distanceHTML);
-                    var pointLeft = 3;
-
-                    if ((i+1) > 9)
-                    {
-                        pointLeft = 6;
-                    }
-
-                    var labelClass = 'markerLabels';
-                    if ((activeIndex-1) == i)
-                    {
-                        labelClass = 'markerActive';
-                    }
 
                     var marker = new MarkerWithLabel({
                         index: i,
@@ -671,7 +750,7 @@ if (!empty($_GET['id']))
                         draggable: false,
                         map: map,
                         labelContent: (i+1),
-                        labelClass: labelClass,
+                        labelClass: 'markerLabels',
                         labelAnchor: new google.maps.Point(8, 21),
                         distance: distance
                     });
@@ -692,8 +771,6 @@ if (!empty($_GET['id']))
             });
 
             fitBoundsToMarkers();
-
-
 
             function formatDistance(m)
             {
@@ -751,22 +828,9 @@ if (!empty($_GET['id']))
             return posYOffset;
         }
 
-        function mapRecenter(latlng,offsetx,offsety) {
-            var point1 = map.getProjection().fromLatLngToPoint(
-                (latlng instanceof google.maps.LatLng) ? latlng : map.getCenter()
-            );
-            var point2 = new google.maps.Point(
-                ( (typeof(offsetx) == 'number' ? offsetx : 0) / Math.pow(2, map.getZoom()) ) || 0,
-                ( (typeof(offsety) == 'number' ? offsety : 0) / Math.pow(2, map.getZoom()) ) || 0
-            );
-            map.setCenter(map.getProjection().fromPointToLatLng(new google.maps.Point(
-                point1.x - point2.x,
-                point1.y + point2.y
-            )));
-        }
-
         function mapRecenterTop(latlng, p)
         {
+            //p = ceiling that map won't recenter above
             p = typeof p !== 'undefined' ? p : 85;
             var offsetx = 0;
             var offsety = calculateNewTargetPosY(p);
@@ -826,8 +890,7 @@ if (!empty($_GET['id']))
                     {
                         map.setCenter(initialLocation);
                     }
-                    //map.setCenter(initialLocation);
-                    //map.fitBounds(userLocationAccuracyCircle.getBounds());
+
                     el.removeClass('loading');
                 }, function() {
                     el.removeClass('loading');
@@ -849,6 +912,11 @@ if (!empty($_GET['id']))
             }
 
             map.fitBounds(bounds);
+            //console.log(map.getCenter());
+            var mapCenter = map.getCenter();
+            activeLat = mapCenter.lat();
+            activeLng = mapCenter.lng();
+            activeLatLng = new google.maps.LatLng(activeLat,activeLng);
         }
 
         function handleNoGeolocation(errorFlag) {
