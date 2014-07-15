@@ -1,0 +1,807 @@
+$container-down-height: 38%
+$container-up-height: 80%
+
+html
+  height: 100%
+  overflow: hidden
+
+body
+  margin: 0
+  padding: 0
+  height: 100% !important
+  overflow: hidden
+
+
+.map-large
+  width: 100%
+  height: 100% !important
+  display: block
+  position: fixed
+
+/* ===============================================================
+ *Basic Swiper Styles
+ *================================================================
+
+html
+  -webkit-font-smoothing: antialiased !important
+  text-shadow: 1px 1px 1px rgba(0,0,0,0.004)
+
+body
+  font-family: helvetica, arial, sans-serif
+
+.introContainer
+  position: fixed
+  top: 0
+  left: 0
+  width: 100%
+  height: 100%
+  z-index: 200
+  .introScreen.blur
+    -webkit-filter: blur(2px) grayscale(70%)
+    -moz-filter: blur(2px) grayscale(70%)
+    -o-filter: blur(2px) grayscale(70%)
+    -ms-filter: blur(2px) grayscale(70%)
+    filter: blur(2px) grayscale(70%)
+
+  .introScreen
+    position: inherit
+    top: 0
+    left: 0
+    width: 100%
+    height: 100%
+    background-color: #000
+    background-size: cover
+    z-index: 200
+  .introContent
+    position: inherit
+    top: 0
+    left: 0
+    width: 100%
+    height: 100%
+    overflow: scroll
+    z-index: 201
+    .introInner
+      padding: 20px
+      -webkit-overflow-scrolling: touch
+      color: #fff
+      .chevron.back
+        display: inline-block
+        position: fixed
+      h2
+        margin-top: 90px
+        color: inherit
+        font-size: 36px
+        font-weight: 200
+        text-shadow: 2px 2px #333
+      h3
+        color: inherit
+        font-weight: 200
+        margin-bottom: 60px
+      p
+        color: inherit
+        font-size: 14px
+        line-height: 24px
+  .bottomContainer
+    width: 100%
+    height: auto
+    position: inherit
+    bottom: 0px
+    display: block
+    z-index: 201
+    background: -moz-linear-gradient(top,  rgba(0,0,0,0) 0%, rgba(0,0,0,0) 2%, rgba(0,0,0,0.65) 13%, rgba(0,0,0,0.65) 100%) /* FF3.6+ */
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(0,0,0,0)), color-stop(2%,rgba(0,0,0,0)), color-stop(13%,rgba(0,0,0,0.65)), color-stop(100%,rgba(0,0,0,0.65))) /* Chrome,Safari4+ */
+    background: -webkit-linear-gradient(top,  rgba(0,0,0,0) 0%,rgba(0,0,0,0) 2%,rgba(0,0,0,0.65) 13%,rgba(0,0,0,0.65) 100%) /* Chrome10+,Safari5.1+ */
+    background: -o-linear-gradient(top,  rgba(0,0,0,0) 0%,rgba(0,0,0,0) 2%,rgba(0,0,0,0.65) 13%,rgba(0,0,0,0.65) 100%) /* Opera 11.10+ */
+    background: -ms-linear-gradient(top,  rgba(0,0,0,0) 0%,rgba(0,0,0,0) 2%,rgba(0,0,0,0.65) 13%,rgba(0,0,0,0.65) 100%) /* IE10+ */
+    background: linear-gradient(to bottom,  rgba(0,0,0,0) 0%,rgba(0,0,0,0) 2%,rgba(0,0,0,0.65) 13%,rgba(0,0,0,0.65) 100%) /* W3C */
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00000000', endColorstr='#a6000000',GradientType=0 ) /* IE6-9 */
+    .blurredTop
+      height: 30px
+      display: block
+
+    .contentTop
+      display: block
+      height: 20px
+      margin: 0 20px
+      border-top: 1px solid #ccc
+      padding: 5px 0
+    .contentArea
+      width: 100%
+      height: auto
+      background-color: #fff
+      .contentInner
+        position: relative
+        padding: 10px 20px
+        .chevron
+          position: absolute
+          top: 15px
+          right: 20px
+        h4, h5
+          padding: 0
+        h4
+          margin: 5px 0
+        h5
+          margin: 0 0 5px 0
+          font-weight: 200
+          font-size: 15px
+
+.overlay
+  position: fixed
+  top: 0
+  left: 0
+  width: 100%
+  height: 100%
+  h3
+    font-family: helvetica, arial, sans-serif
+    size: 1rem
+    font-weight: 400
+    position: absolute
+    top: 40%
+    left: 50%
+
+.overlay.grey
+  background-color: rgba(51, 51, 51, 0.75)
+
+.overlay.white
+  background-color: rgba(255, 255, 255, 1)
+
+.overlay.loading
+  background-image: url('img/preloader-2.gif')
+  background-repeat: no-repeat
+  background-position: center center
+
+.back-to-intro
+  display: block
+  z-index: 100
+  position: absolute
+  top: 10px
+  left: 10px
+  width: 33px
+  height: 33px
+
+.get-position
+  display: block
+  z-index: 100
+  position: absolute
+  top: 10px
+  right: 10px
+  width: 33px
+  height: 33px
+  a
+    display: block
+    width: inherit
+    height: inherit
+    position: relative
+    background-color: #fff
+    border: 1px solid #333
+    border-radius: 49%
+    &:before
+      content: ''
+      position: absolute
+      left: 0
+      top: 0
+      width: 33px
+      height: 33px
+      background-image: url('img/sprite.png')
+      background-position: -22px 0
+  .active
+    border: 1px solid #fff
+    border-radius: 49%
+    background-color: #6eb240
+    &:before
+      background-position: -55px 0
+  .loading
+    border: 1px solid #fff
+    border-radius: 49%
+    background-color: transparent
+    background-image: url('img/preloader-2-sml.gif')
+    &:before
+      background-image: none !important
+
+.map-large
+  img
+    max-width: inherit
+
+.swiper-holder
+  width: 100%
+  height: $container-down-height
+  position: fixed
+  bottom: 0
+  z-index: 100
+
+
+.swiper-container
+  width: 100%
+  margin: 0 auto
+  position: relative
+  overflow: hidden
+  -webkit-backface-visibility: hidden
+  -moz-backface-visibility: hidden
+  -ms-backface-visibility: hidden
+  -o-backface-visibility: hidden
+  backface-visibility: hidden
+  /* Fix of Webkit flickering
+  z-index: 1
+
+.swiper-wrapper
+  position: relative
+  padding-top: 12px
+  width: 100%
+  -webkit-transition-property: -webkit-transform, left, top
+  -webkit-transition-duration: 0s
+  -webkit-transform: translate3d(0px, 0, 0)
+  -webkit-transition-timing-function: ease
+  -moz-transition-property: -moz-transform, left, top
+  -moz-transition-duration: 0s
+  -moz-transform: translate3d(0px, 0, 0)
+  -moz-transition-timing-function: ease
+  -o-transition-property: -o-transform, left, top
+  -o-transition-duration: 0s
+  -o-transform: translate3d(0px, 0, 0)
+  -o-transition-timing-function: ease
+  -o-transform: translate(0px, 0px)
+  -ms-transition-property: -ms-transform, left, top
+  -ms-transition-duration: 0s
+  -ms-transform: translate3d(0px, 0, 0)
+  -ms-transition-timing-function: ease
+  transition-property: transform, left, top
+  transition-duration: 0s
+  transform: translate3d(0px, 0, 0)
+  transition-timing-function: ease
+
+.swiper-free-mode > .swiper-wrapper
+  -webkit-transition-timing-function: ease-out
+  -moz-transition-timing-function: ease-out
+  -ms-transition-timing-function: ease-out
+  -o-transition-timing-function: ease-out
+  transition-timing-function: ease-out
+  margin: 0 auto
+
+.swiper-slide
+  float: left
+
+/* IE10 Windows Phone 8 Fixes
+
+.swiper-wp8-horizontal
+  -ms-touch-action: pan-y
+
+.swiper-wp8-vertical
+  -ms-touch-action: pan-x
+
+.swiper-slide
+  float: left
+  max-width: 620px
+  width: 85vw
+  height: 100%
+  opacity: 0.4
+  -webkit-box-shadow: 0px -2px 30px 0px rgba(50, 50, 50, 0.75)
+  -moz-box-shadow:    0px -2px 30px 0px rgba(50, 50, 50, 0.75)
+  box-shadow:         0px -2px 30px 0px rgba(50, 50, 50, 0.75)
+  -webkit-transition: 300ms
+  -moz-transition: 300ms
+  -ms-transition: 300ms
+  -o-transition: 300ms
+  transition: 300ms
+  -webkit-transform: scale(0)
+  -moz-transform: scale(0)
+  -ms-transform: scale(0)
+  -o-transform: scale(0)
+  transform: scale(0)
+  .img-thmb
+    margin: 0 auto
+    //width: 230px
+    //height: 130px
+    img
+      max-width: 620px
+      width: 85vw
+      height: inherit
+
+
+.swiper-slide-visible
+  opacity: 0.5
+  -webkit-transform: scale(0.8)
+  -moz-transform: scale(0.8)
+  -ms-transform: scale(0.8)
+  -o-transform: scale(0.8)
+  transform: scale(0.8)
+
+.swiper-slide-active
+  top: 0
+  opacity: 1
+  -webkit-transform: scale(1)
+  -moz-transform: scale(1)
+  -ms-transform: scale(1)
+  -o-transform: scale(1)
+  transform: scale(1)
+
+.white-slide
+  background-color: #fff
+
+
+.toggle-up-down
+  width: 21px
+  height: 21px
+  border: 1px solid #333
+  border-radius: 49%
+  margin: 0
+  padding: 0
+  top: -10px
+  left: calc(50% - 10px)
+  position: absolute
+  &:before
+    content: ''
+    position: absolute
+    left: 0
+    top: 0
+    width: 21px
+    height: 21px
+    background-image: url('img/sprite.png')
+    background-position: 0 0
+
+.slide-down
+  -webkit-animation: spin-0-180 0.5s linear 1 forwards
+  -moz-animation: spin-0-180 0.5s linear 1 forwards
+  animation: spin-0-180 0.5s linear 1 forwards
+
+.slide-up
+  -webkit-animation: spin-180-0 0.5s linear 1 forwards
+  -moz-animation: spin-180-0 0.5s linear 1 forwards
+  animation: spin-180-0 0.5s linear 1 forwards
+
+.holder-grow
+  -webkit-animation: container-up 0.5s 1 forwards
+  -moz-animation: container-up 0.5s 1 forwards
+  animation: container-up 0.5s 1 forwards
+
+.holder-shrink
+  -webkit-animation: container-down 0.5s 1 forwards
+  -moz-animation: container-down 0.5s 1 forwards
+  animation: container-down 0.5s 1 forwards
+
+.swiper-slide.white-slide
+  //outline: 1px solid #333
+  -webkit-box-shadow: 0px -3px 20px 0px rgba(50, 50, 50, 0.75)
+  -moz-box-shadow:    0px -3px 20px 0px rgba(50, 50, 50, 0.75)
+  box-shadow:         0px -3px 20px 0px rgba(50, 50, 50, 0.75)
+
+.red-slide
+  background: #ca4040
+
+.blue-slide
+  background: #4390ee
+
+.orange-slide
+  background: #ff8604
+
+.green-slide
+  background: #49a430
+
+.pink-slide
+  background: #973e76
+
+.swiper-slide
+  .title
+    padding: 20px 10px 12px 10px
+    text-align: left
+    &:before
+      content: ''
+      position: absolute
+      width: 36px
+      height: 9px
+      left: 50%
+      top: 5px
+      margin-left: -18px
+      background-color: transparent
+      background-image: url('img/sprite.png')
+      background-position: -160px -22px
+    h2
+      margin: 0
+      padding: 0
+      font-size: 16px
+      font-weight: 400
+      line-height: 20px
+    span
+      font-size: 12px
+  .title.up
+    &:before
+      height: 12px
+      background-position: -232px -22px
+  .title.down
+    &:before
+      height: 12px
+      background-position: -88px -22px
+  .title.shadowed
+    -webkit-box-shadow: 0px 10px 30px 0px rgba(50, 50, 50, 0.75)
+    -moz-box-shadow: 0px 10px 30px 0px rgba(50, 50, 50, 0.75)
+    box-shadow: 0px 10px 30px 0px rgba(50, 50, 50, 0.75)
+  .chevron
+    position: absolute
+    top: 18px
+    right: 10px
+
+.paginationHolder
+  width: 100%
+  height: auto
+  position: fixed
+  z-index: 100
+  left: 0px
+  bottom: 0px
+  background-color: #000
+  padding: 5px 0
+
+.pagination
+  width: 90%
+  margin: 0 auto
+  text-align: center
+
+.swiper-pagination-switch
+  display: inline-block
+  width: 8px
+  height: 8px
+  border-radius: 8px
+  background: #222
+  margin-right: 15px
+  opacity: 0.8
+  border: 1px solid #fff
+  cursor: pointer
+
+.swiper-visible-switch
+  opacity: 1
+  top: 0
+  background: #aaa
+
+.swiper-active-switch
+  background: #fff
+
+.chevron, a.chevron
+  text-indent: -10000px
+  display: inline-block
+  width: 33px
+  height: 33px
+  border-radius: 50%
+  background-color: #6eb240
+  &:before
+    content: ''
+    position: absolute
+    top: 6px
+    left: 11px
+    width: 11px
+    height: 20px
+    background-image: url('img/sprite.png')
+    background-position: -18px -88px
+
+.chevron.back
+  &:before
+    top: 6px
+    left: 9px
+    width: 11px
+    height: 20px
+    background-position: -34px -88px
+.chevron.white
+  background-color: #fff
+
+
+.bondi-blue
+  background-color: #008cba
+.wasabi-green
+  background-color: #6eb240
+
+.contentHolder
+  height: 15%
+  width: inherit
+  max-width: inherit
+  overflow: scroll
+  -webkit-overflow-scrolling: touch
+  p
+    font-size: 14px
+    line-height: 18px
+    max-width: 600px
+    width: calc(85vw - 32px)
+    padding: 0 1rem
+  img
+    max-width: 620px
+    width: 85vw
+  ul
+    padding: 0
+    margin: 0
+    list-style: none
+    li
+      display: list-item
+      padding: 12px 10px 12px 12px
+      border-bottom: 1px solid #f6f6f6
+      position: relative
+      &:before
+        content: ''
+        z-index: 1
+        position: absolute
+        width: 16px
+        height: 21px
+        top: 12px
+        left: 10px
+        background-image: url('img/sprite.png')
+        background-position: 0px -58px
+      &:first-child
+        border-top: 1px solid #f6f6f6
+      span
+        font-size: 10px
+        color: #fff
+        z-index: 10
+        position: absolute
+        top: 14px
+        width: 12px
+        text-align: center
+        display: inline-block
+      .distance
+        font-size: 12px
+        float: right
+        color: #333
+        position: relative
+        top: 3px
+        white-space: nowrap
+        margin-right: 15px
+      a
+        font-size: 12px
+        display: inline-block
+        text-decoration: none
+        color: #333
+        padding-left: 20px
+        max-width: 75%
+
+.markerLabels
+  color: #fff
+  width: 16px
+  height: 21px
+  text-align: center
+  &:before
+    content: ''
+    z-index: -1
+    position: absolute
+    width: 16px
+    height: 21px
+    top: 0px
+    left: 0px
+    background-image: url('img/sprite.png')
+    background-position: 0px -58px
+.markerActive
+  color: #000
+  width: 16px
+  height: 21px
+  text-align: center
+  &:before
+    content: ''
+    z-index: -1
+    position: absolute
+    width: 16px
+    height: 21px
+    top: 0px
+    left: 0px
+    background-image: url('img/sprite.png')
+    background-position: -23px -58px
+
+.markerLabels.active
+  color: #000
+  &:before
+    background-position: -23px -58px
+
+
+.markerLabelActive
+  color: #000
+  z-index: 10000
+
+#mapCanvas .gm-style .gm-style-cc span, .gm-style .gm-style-cc a, .gm-style .gm-style-mtc div
+  padding: 8px 8px !important
+  div
+    padding: 1px 8px !important
+
+/* ===============================================================
+ *Your custom styles, here you need to specify container's and slide's
+ *sizes, pagination, etc.
+ *================================================================
+
+/*.swiper-container
+/* Specify Swiper's Size:
+/*width:200px;
+ *height: 100px;
+
+/*.swiper-slide
+/* Specify Slides's Size:
+/*width: 100%;
+ *height: 100%;
+
+/*.swiper-slide-active
+/* Specific active slide styling:
+
+/*.swiper-slide-visible
+/* Specific visible slide styling:
+
+/* ===============================================================
+ *Pagination Styles
+ *================================================================
+
+/*.swiper-pagination-switch
+/* Stylize pagination button:
+
+/*.swiper-active-switch
+/* Specific active button style:
+
+/*.swiper-visible-switch
+/* Specific visible button style:
+
+
+
+/*==================================================================
+  *Animations
+  *===================================================================
+
+
+
+@-moz-keyframes container-up
+  from
+    height: $container-down-height
+  to
+    height: $container-up-height
+@-webkit-keyframes container-up
+  from
+    height: $container-down-height
+  to
+    height: $container-up-height
+@keyframes container-up
+  from
+    height: $container-down-height
+  to
+    height: $container-up-height
+
+@-moz-keyframes container-down
+  from
+    height: $container-up-height
+  to
+    height: $container-down-height
+@-webkit-keyframes container-down
+  from
+    height: $container-up-height
+  to
+    height: $container-down-height
+@keyframes container-down
+  from
+    height: $container-up-height
+  to
+    height: $container-down-height
+
+
+
+
+@-moz-keyframes height-37-80
+  from
+    height: 37%
+  to
+    height: 80%
+@-webkit-keyframes height-37-80
+  from
+    height: 37%
+  to
+    height: 80%
+@keyframes height-37-80
+  from
+    height: 37%
+  to
+    height: 80%
+
+@-moz-keyframes height-80-37
+  from
+    height: 80%
+  to
+    height: 37%
+@-webkit-keyframes height-80-37
+  from
+    height: 80%
+  to
+    height: 37%
+@keyframes height-80-37
+  from
+    height: 80%
+  to
+    height: 37%
+
+
+@-moz-keyframes height-33-80
+  from
+    height: 33%
+  to
+    height: 80%
+@-webkit-keyframes height-33-80
+  from
+    height: 33%
+  to
+    height: 80%
+@keyframes height-33-80
+  from
+    height: 33%
+  to
+    height: 80%
+
+@-moz-keyframes height-80-33
+  from
+    height: 80%
+  to
+    height: 33%
+@-webkit-keyframes height-80-33
+  from
+    height: 80%
+  to
+    height: 33%
+@keyframes height-80-33
+  from
+    height: 80%
+  to
+    height: 33%
+
+
+
+@-moz-keyframes height-33-75
+  from
+    height: 33%
+  to
+    height: 75%
+@-webkit-keyframes height-33-75
+  from
+    height: 33%
+  to
+    height: 75%
+@keyframes height-33-75
+  from
+    height: 33%
+  to
+    height: 75%
+
+@-moz-keyframes height-75-33
+  from
+    height: 75%
+  to
+    height: 33%
+@-webkit-keyframes height-75-33
+  from
+    height: 75%
+  to
+    height: 33%
+@keyframes height-75-33
+  from
+    height: 75%
+  to
+    height: 33%
+
+@-moz-keyframes spin-0-180
+  from
+    -moz-transform: rotate(0deg)
+  to
+    -moz-transform: rotate(180deg)
+
+@-webkit-keyframes spin-0-180
+  from
+    -webkit-transform: rotate(0deg)
+  to
+    -webkit-transform: rotate(180deg)
+@keyframes spin-0-180
+  from
+    transform: rotate(0deg)
+  to
+    transform: rotate(180deg)
+
+
+@-moz-keyframes spin-180-0
+  from
+    -moz-transform: rotate(180deg)
+  to
+    -moz-transform: rotate(0deg)
+
+@-webkit-keyframes spin-180-0
+  from
+    -webkit-transform: rotate(180deg)
+  to
+    -webkit-transform: rotate(0deg)
+@keyframes spin-180-0
+  from
+    transform: rotate(180deg)
+  to
+    transform: rotate(0deg)
+
+
