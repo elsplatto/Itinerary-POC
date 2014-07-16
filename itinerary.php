@@ -64,6 +64,8 @@ if (!empty($_GET['id']))
     <head>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0" />
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="mobile-web-app-capable" content="yes">
         <title>Itinerary - <?=$itineraryDetail['title']?></title>
         <link rel="stylesheet" href="css/idangerous.swiper.css" />
         <link rel="stylesheet" href="css/style.css" />
@@ -72,8 +74,8 @@ if (!empty($_GET['id']))
     </head>
     <body>
     <div id="introContainer" class="introContainer">
-        <div id="introScreen" class="introScreen" style="background-image: url('img/itineraries/portrait/<?=$itineraryDetail['image_portrait']?>')">
-
+        <div id="introScreen" class="introScreen">
+            <img src="img/itineraries/portrait/<?=$itineraryDetail['image_portrait']?>" />
         </div>
 
         <div id="introContent" class="introContent">
@@ -168,38 +170,46 @@ if (!empty($_GET['id']))
 
     $(function(){
 
+        function toggleFullScreen() {
+            var doc = window.document;
+            var docEl = doc.documentElement;
+
+            var requestFullScreen = docEl.requestFullscreen || docEl.mozRequestFullScreen || docEl.webkitRequestFullScreen || docEl.msRequestFullscreen;
+            var cancelFullScreen = doc.exitFullscreen || doc.mozCancelFullScreen || doc.webkitExitFullscreen || doc.msExitFullscreen;
+
+            if(!doc.fullscreenElement && !doc.mozFullScreenElement && !doc.webkitFullscreenElement && !doc.msFullscreenElement) {
+                requestFullScreen.call(docEl);
+            }
+            else {
+                cancelFullScreen.call(doc);
+            }
+        }
+
         var screenHeight = $(document).height();
         var screenWidth = $(document).width();
         var bottomElementHeight = $('#bottomContainer').outerHeight();
         var blurredTopHeight = $('#blurredTop').outerHeight();
         var introContentHeight = (screenHeight - bottomElementHeight) + blurredTopHeight;
+        console.log('introContentHeight: ' + introContentHeight);
+        console.log('screenHeight: ' + screenHeight);
+        console.log('bottomElementHeight: ' + bottomElementHeight);
+        console.log('blurredTopHeight: ' + blurredTopHeight);
+
         $('#introContent').css({
             height: introContentHeight
         });
 
         $('.toMaps').click(function(e){
             e.preventDefault();
-            $('#introContainer').css({position: 'absolute'});
-            $('#introContainer').animate({
-                left: "-"+screenWidth+""
-            }, 500, function(){
-                $('#introContainer').css({
-                    display: 'none'
-                })
-            });
+            $('#introContainer').hasClass('in') && $('#introContainer').removeClass('in');
+            $('#introContainer').addClass('out');
         });
 
 
         $('.back-to-intro').click(function(e) {
             e.preventDefault();
-            $('#introContainer').css({display: 'block'});
-            $('#introContainer').animate({
-                left: 0
-            }, 500, function(){
-                $('#introContainer').css({
-                    position: 'fixed'
-                })
-            });
+            $('#introContainer').hasClass('out') && $('#introContainer').removeClass('out');
+            $('#introContainer').addClass('in');
         })
 
         $('#introContent').scroll(function(e){

@@ -29,19 +29,37 @@ html
 body
   font-family: helvetica, arial, sans-serif
 
+.introContainer.out
+  -webkit-animation: intro-out 0.5s ease 1 forwards
+  animation: intro-out 0.5s ease 1 forwards
+  .introContent
+    .introInner
+      .chevron.back
+        position: absolute
+
+.introContainer.in
+  -webkit-animation: intro-in 0.5s ease 1 forwards
+  animation: intro-in 0.5s ease 1 forwards
+  .introContent
+    .introInner
+      .chevron.back
+        position: fixed
+
 .introContainer
-  position: fixed
+  position: absolute
   top: 0
   left: 0
   width: 100%
   height: 100%
   z-index: 200
+  overflow: hidden
   .introScreen.blur
-    -webkit-filter: blur(2px) grayscale(70%)
-    -moz-filter: blur(2px) grayscale(70%)
-    -o-filter: blur(2px) grayscale(70%)
-    -ms-filter: blur(2px) grayscale(70%)
-    filter: blur(2px) grayscale(70%)
+    img
+      -webkit-filter: blur(6px) grayscale(70%)
+      -moz-filter: blur(6px) grayscale(70%)
+      -o-filter: blur(6px) grayscale(70%)
+      -ms-filter: blur(6px) grayscale(70%)
+      filter: blur(6px) grayscale(70%)
 
   .introScreen
     position: inherit
@@ -52,21 +70,26 @@ body
     background-color: #000
     background-size: cover
     z-index: 200
+    img
+      max-width: 100%
+      height: 100%
   .introContent
     position: inherit
     top: 0
     left: 0
     width: 100%
     height: 100%
-    overflow: scroll
+    overflow-y: scroll
+    -webkit-overflow-scrolling: touch
     z-index: 201
     .introInner
       padding: 20px
-      -webkit-overflow-scrolling: touch
       color: #fff
       .chevron.back
         display: inline-block
         position: fixed
+        top: 10px
+        left: 10px
       h2
         margin-top: 90px
         color: inherit
@@ -633,6 +656,42 @@ body
   *Animations
   *===================================================================
 
+
+
+
+@-moz-keyframes intro-out
+  from
+    left: 0
+  to
+    left: -100vw
+
+@-webkit-keyframes intro-out
+  from
+    left: 0
+  to
+    left: -100vw
+@keyframes intro-out
+  from
+    left: 0
+  to
+    left: -100vw
+
+@-moz-keyframes intro-in
+  from
+    left: -100vw
+  to
+    left: 0
+
+@-webkit-keyframes intro-in
+  from
+    left: -100vw
+  to
+    left: 0
+@keyframes intro-in
+  from
+    left: -100vw
+  to
+    left: 0
 
 
 @-moz-keyframes container-up
