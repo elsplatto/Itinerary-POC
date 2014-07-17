@@ -356,7 +356,7 @@ EOF;
         $json_filename = 'itinerary-' . $this->itineraryId . '-' . $this->date_last_modified . '.json';
         $previous_json_filename = 'itinerary-' . $this->itineraryId . '-' . $this->previous_edit_date_stamp . '.json';
         $json = '';
-        $json .= '{"itinerary": [{';
+        $json .= '{"itinerary": {';
 
         $results = array();
         $results[0]['title'] = $this->title;
@@ -401,11 +401,11 @@ EOF;
             $json .= '{';
             $json .= '"id":' . $row['id'] . ',';
             $json .= '"title":"' . $row['title'] . '",';
-            $json .= '"images": [{';
+            $json .= '"images": {';
             $json .= '"large":' . json_encode($this->baseURL . $this->location_landscape_path_lge . $row['image_landscape']) . ',';
             $json .= '"medium":' . json_encode($this->baseURL . $this->location_landscape_path_med . $row['image_landscape']) . ',';
             $json .= '"small":' . json_encode($this->baseURL . $this->location_landscape_path_sml . $row['image_landscape']);
-            $json .= '}],';
+            $json .= '},';
             $json .= '"content":'.json_encode($row['content']).',';
             $json .= '"lat":' . $row['lat'] . ',';
             $json .= '"lng":' . $row['lng'] . ',';
@@ -440,7 +440,7 @@ EOF;
         $this->slide_js .= '];';
 
         $json .= ']}';
-        $json .= ']}';
+        $json .= '}';
 
         if (file_exists('../json/'.$previous_json_filename) && !is_null($previous_json_filename))
         {
