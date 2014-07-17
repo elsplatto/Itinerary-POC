@@ -33,17 +33,15 @@ body
   -webkit-animation: intro-out 0.5s ease 1 forwards
   animation: intro-out 0.5s ease 1 forwards
   .introContent
-    .introInner
-      .chevron.back
-        position: absolute
+    .chevron.back
+      position: absolute
 
 .introContainer.in
   -webkit-animation: intro-in 0.5s ease 1 forwards
   animation: intro-in 0.5s ease 1 forwards
   .introContent
-    .introInner
-      .chevron.back
-        position: fixed
+    .chevron.back
+      position: fixed
 
 .introContainer
   position: absolute
@@ -82,14 +80,14 @@ body
     overflow-y: scroll
     -webkit-overflow-scrolling: touch
     z-index: 201
+    .chevron.back
+      display: inline-block
+      position: fixed
+      top: 10px
+      left: 10px
     .introInner
       padding: 20px
       color: #fff
-      .chevron.back
-        display: inline-block
-        position: fixed
-        top: 10px
-        left: 10px
       h2
         margin-top: 90px
         color: inherit
@@ -173,9 +171,9 @@ body
   background-repeat: no-repeat
   background-position: center center
 
-.back-to-intro
+.back-to
   display: block
-  z-index: 100
+  z-index: 300
   position: absolute
   top: 10px
   left: 10px
@@ -513,16 +511,17 @@ body
   height: 15%
   width: inherit
   max-width: inherit
-  overflow: scroll
+  overflow-y: scroll
+  overflow-x: hidden
   -webkit-overflow-scrolling: touch
   p
     font-size: 14px
     line-height: 18px
     max-width: 600px
-    width: calc(85vw - 32px)
+    //width: calc(85vw - 32px)
     padding: 0 1rem
   img
-    max-width: 620px
+    max-width: inherit
     width: 85vw
   ul
     padding: 0
@@ -662,36 +661,48 @@ body
 @-moz-keyframes intro-out
   from
     left: 0
+    width: 100vw
   to
     left: -100vw
+    width: 0
 
 @-webkit-keyframes intro-out
   from
     left: 0
+    width: 100vw
   to
     left: -100vw
+    width: 0
 @keyframes intro-out
   from
     left: 0
+    width: 100vw
   to
     left: -100vw
+    width: 0
 
 @-moz-keyframes intro-in
   from
     left: -100vw
+    width: 0
   to
     left: 0
+    width: 100vw
 
 @-webkit-keyframes intro-in
   from
     left: -100vw
+    width: 0
   to
     left: 0
+    width: 100vw
 @keyframes intro-in
   from
     left: -100vw
+    width: 0
   to
     left: 0
+    width: 100vw
 
 
 @-moz-keyframes container-up

@@ -27,13 +27,13 @@ body {
 .introContainer.out {
   -webkit-animation: intro-out 0.5s ease 1 forwards;
   animation: intro-out 0.5s ease 1 forwards; }
-  .introContainer.out .introContent .introInner .chevron.back {
+  .introContainer.out .introContent .chevron.back {
     position: absolute; }
 
 .introContainer.in {
   -webkit-animation: intro-in 0.5s ease 1 forwards;
   animation: intro-in 0.5s ease 1 forwards; }
-  .introContainer.in .introContent .introInner .chevron.back {
+  .introContainer.in .introContent .chevron.back {
     position: fixed; }
 
 .introContainer {
@@ -71,14 +71,14 @@ body {
     overflow-y: scroll;
     -webkit-overflow-scrolling: touch;
     z-index: 201; }
+    .introContainer .introContent .chevron.back {
+      display: inline-block;
+      position: fixed;
+      top: 10px;
+      left: 10px; }
     .introContainer .introContent .introInner {
       padding: 20px;
       color: white; }
-      .introContainer .introContent .introInner .chevron.back {
-        display: inline-block;
-        position: fixed;
-        top: 10px;
-        left: 10px; }
       .introContainer .introContent .introInner h2 {
         margin-top: 90px;
         color: inherit;
@@ -161,9 +161,9 @@ body {
   background-repeat: no-repeat;
   background-position: center center; }
 
-.back-to-intro {
+.back-to {
   display: block;
-  z-index: 100;
+  z-index: 300;
   position: absolute;
   top: 10px;
   left: 10px;
@@ -490,16 +490,16 @@ body {
   height: 15%;
   width: inherit;
   max-width: inherit;
-  overflow: scroll;
+  overflow-y: scroll;
+  overflow-x: hidden;
   -webkit-overflow-scrolling: touch; }
   .contentHolder p {
     font-size: 14px;
     line-height: 18px;
     max-width: 600px;
-    width: calc(85vw - 32px);
     padding: 0 1rem; }
   .contentHolder img {
-    max-width: 620px;
+    max-width: inherit;
     width: 85vw; }
   .contentHolder ul {
     padding: 0;
@@ -623,45 +623,57 @@ body {
  *=================================================================== */
 @-moz-keyframes intro-out {
   from {
-    left: 0; }
+    left: 0;
+    width: 100vw; }
 
   to {
-    left: -100vw; } }
+    left: -100vw;
+    width: 0; } }
 
 @-webkit-keyframes intro-out {
   from {
-    left: 0; }
+    left: 0;
+    width: 100vw; }
 
   to {
-    left: -100vw; } }
+    left: -100vw;
+    width: 0; } }
 
 @keyframes intro-out {
   from {
-    left: 0; }
+    left: 0;
+    width: 100vw; }
 
   to {
-    left: -100vw; } }
+    left: -100vw;
+    width: 0; } }
 
 @-moz-keyframes intro-in {
   from {
-    left: -100vw; }
+    left: -100vw;
+    width: 0; }
 
   to {
-    left: 0; } }
+    left: 0;
+    width: 100vw; } }
 
 @-webkit-keyframes intro-in {
   from {
-    left: -100vw; }
+    left: -100vw;
+    width: 0; }
 
   to {
-    left: 0; } }
+    left: 0;
+    width: 100vw; } }
 
 @keyframes intro-in {
   from {
-    left: -100vw; }
+    left: -100vw;
+    width: 0; }
 
   to {
-    left: 0; } }
+    left: 0;
+    width: 100vw; } }
 
 @-moz-keyframes container-up {
   from {
