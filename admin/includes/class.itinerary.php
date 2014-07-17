@@ -356,7 +356,7 @@ EOF;
         $json_filename = 'itinerary-' . $this->itineraryId . '-' . $this->date_last_modified . '.json';
         $previous_json_filename = 'itinerary-' . $this->itineraryId . '-' . $this->previous_edit_date_stamp . '.json';
         $json = '';
-        $json .= '{"itinerary": [';
+        $json .= '{"itinerary": [{';
 
         $results = array();
         $results[0]['title'] = $this->title;
@@ -374,10 +374,21 @@ EOF;
         array_push($this->img_list, $this->baseURL . $this->landscape_path . $this->image_landscape);
         array_push($this->img_list, $this->baseURL . $this->portrait_path . $this->image_portrait);
 
-        foreach ($results as $result)
+
+        /*foreach ($results as $result)
         {
             $json .= json_encode($result);
-        }
+        }*/
+
+        $json .= '"title":'.json_encode($results[0]['title']).',';
+        $json .= '"page_name":'.json_encode($results[0]['page_name']).',';
+        $json .= '"sub_title":'.json_encode($results[0]['sub_title']).',';
+        $json .= '"intro_text":'.json_encode($results[0]['intro_text']).',';
+        $json .= '"description":'.json_encode($results[0]['description']).',';
+        $json .= '"image_landscape":'.json_encode($results[0]['image_landscape']).',';
+        $json .= '"image_portrait":'.json_encode($results[0]['image_portrait']).',';
+        $json .= '"date_created":'.$results[0]['date_created'].',';
+        $json .= '"date_last_modified":'.$results[0]['date_last_modified'];
 
         $rowCount = $this->obj_locations->num_rows;
         $i = 0;
@@ -390,15 +401,15 @@ EOF;
             $json .= '{';
             $json .= '"id":' . $row['id'] . ',';
             $json .= '"title":"' . $row['title'] . '",';
-            $json .= '"images [{';
-            $json .= '"large:"' . json_encode($this->baseURL . $this->location_landscape_path_lge . $row['image_landscape']) . '",';
-            $json .= '"medium:"' . json_encode($this->baseURL . $this->location_landscape_path_med . $row['image_landscape']) . '",';
-            $json .= '"small:"' . json_encode($this->baseURL . $this->location_landscape_path_sml . $row['image_landscape']) . '"';
+            $json .= '"images": [{';
+            $json .= '"large":' . json_encode($this->baseURL . $this->location_landscape_path_lge . $row['image_landscape']) . ',';
+            $json .= '"medium":' . json_encode($this->baseURL . $this->location_landscape_path_med . $row['image_landscape']) . ',';
+            $json .= '"small":' . json_encode($this->baseURL . $this->location_landscape_path_sml . $row['image_landscape']);
             $json .= '}],';
-            $json .= '"content:"'.json_encode($row['content']).'",';
+            $json .= '"content":'.json_encode($row['content']).',';
             $json .= '"lat":' . $row['lat'] . ',';
             $json .= '"lng":' . $row['lng'] . ',';
-            $json .= '"tags":"' . $row['tags'] . '"';
+            $json .= '"tags":' . json_encode($row['tags']);
             $json .= '}';
 
             array_push($this->img_list, $this->baseURL . $this->location_landscape_path_med . $row['image_landscape']);
@@ -428,7 +439,7 @@ EOF;
 
         $this->slide_js .= '];';
 
-        $json .= ']';
+        $json .= ']}';
         $json .= ']}';
 
         if (file_exists('../json/'.$previous_json_filename) && !is_null($previous_json_filename))
