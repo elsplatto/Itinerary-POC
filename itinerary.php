@@ -154,9 +154,9 @@ if (!empty($_GET['id']))
         </div>
     </div>
 
-    <div class="paginationHolder">
+   <!-- <div class="paginationHolder">
         <div class="pagination"></div>
-    </div>
+    </div>-->
 
     <div class="map-large" id="mapCanvas">
 
@@ -263,6 +263,176 @@ if (!empty($_GET['id']))
 
         $('body').on('mousedown touchstart', '.title', function(e)
         {
+            mouseDownOnTitle = true;
+            e.preventDefault();
+            e.stopPropagation();
+            //var touch = e.originalEvent.touches[0] || e.originalEvent.changedTouches[0];
+            var touch = e.originalEvent;
+
+
+            holderHeight = $('#swiperHolder').outerHeight();
+            dragStartTime = e.timeStamp;
+            dragStartY = e.originalEvent.pageY;
+            distanceFromBottom = (screenHeight - dragStartY);
+            dragHolderDiff = (holderHeight - distanceFromBottom);
+            originalDistanceFromBottom = distanceFromBottom;
+
+        }).on('mousemove touchmove', '.title', function(e){
+            //e.stopPropagation();
+            e.preventDefault();
+            if (mouseDownOnTitle)
+            {
+                //var touch = e.originalEvent.touches[0] || e.originalEvent.changedTouches[0];
+                var touch = e.originalEvent;
+
+                holderHeight = $('#swiperHolder').outerHeight();
+                distanceFromBottom = (screenHeight - touch.pageY);
+                if (dragStartY > 0 && ((distanceFromBottom + dragHolderDiff) < upperThreshold) && ((distanceFromBottom + dragHolderDiff) > lowerThreshold))
+                {
+                    $('#swiperHolder').css({
+                        height: ((screenHeight - touch.pageY) + dragHolderDiff)
+                    })
+                }
+            }
+        }).on('mouseup touchend', '.title', function(e){
+            e.preventDefault();
+            mouseDownOnTitle = false;
+
+            var timeSpan = (e.timeStamp - dragStartTime);
+            //var touch = e.originalEvent.touches[0] || e.originalEvent.changedTouches[0];
+            var touch = e.originalEvent;
+
+            distanceFromBottom = (screenHeight - touch.pageY);
+            distanceCovered = (distanceFromBottom - originalDistanceFromBottom);
+            holderHeight = $('#swiperHolder').outerHeight();
+
+            var velocity = (timeSpan/Math.abs(distanceCovered));
+
+            if (velocity < 5)
+            {
+                if ((holderHeight + distanceCovered) < lowerThreshold)
+                {
+                    $('#swiperHolder').animate({
+                        height: lowerThreshold
+                    }, timeSpan, function() {
+                        slidesDown();
+                    })
+                }
+                else if ((holderHeight + distanceCovered) > upperThreshold)
+                {
+                    $('#swiperHolder').animate({
+                        height: upperThreshold
+                    }, timeSpan, function() {
+                        slidesUp();
+                    })
+                }
+                else if ((holderHeight + distanceCovered) > lowerThreshold)
+                {
+                    $('#swiperHolder').animate({
+                        height: (holderHeight + distanceCovered)
+                    }, timeSpan, function() {
+                        slidesMiddled();
+                    })
+                }
+            }
+            else
+            {
+                if ((holderHeight - lowerThreshold) < 40)
+                {
+                    slidesDown();
+                }
+
+                else if ((upperThreshold - holderHeight) < 40)
+                {
+                    slidesUp();
+                }
+                else
+                {
+                    slidesMiddled();
+                }
+            }
+        });
+
+
+        /*$('body').on('mousedown touchstart', '.title', function(e)
+        {
+            e.stopPropagation();
+            holderHeight = $('#swiperHolder').outerHeight();
+            dragStartTime = e.timeStamp;
+            dragStartY = e.originalEvent.pageY;
+            distanceFromBottom = (screenHeight - dragStartY);
+            dragHolderDiff = (holderHeight - distanceFromBottom);
+            originalDistanceFromBottom = distanceFromBottom;
+
+        }).on('mousemove touchmove', '.title', function(e){
+            e.stopPropagation();
+            e.preventDefault();
+            var touch = e.originalEvent.touches[0] || e.originalEvent.changedTouches[0];
+            holderHeight = $('#swiperHolder').outerHeight();
+            distanceFromBottom = (screenHeight - touch.pageY);
+            if (dragStartY > 0 && ((distanceFromBottom + dragHolderDiff) < upperThreshold) && ((distanceFromBottom + dragHolderDiff) > lowerThreshold))
+            {
+                $('#swiperHolder').css({
+                    height: ((screenHeight - touch.pageY) + dragHolderDiff)
+                })
+            }
+        }).on('mouseup touchend', '.title', function(e){
+
+            var timeSpan = (e.timeStamp - dragStartTime);
+            var touch = e.originalEvent.touches[0] || e.originalEvent.changedTouches[0];
+            distanceFromBottom = (screenHeight - touch.pageY);
+            distanceCovered = (distanceFromBottom - originalDistanceFromBottom);
+            holderHeight = $('#swiperHolder').outerHeight();
+
+            var velocity = (timeSpan/Math.abs(distanceCovered));
+
+            if (velocity < 5)
+            {
+                if ((holderHeight + distanceCovered) < lowerThreshold)
+                {
+                    $('#swiperHolder').animate({
+                        height: lowerThreshold
+                    }, timeSpan, function() {
+                        slidesDown();
+                    })
+                }
+                else if ((holderHeight + distanceCovered) > upperThreshold)
+                {
+                    $('#swiperHolder').animate({
+                        height: upperThreshold
+                    }, timeSpan, function() {
+                        slidesUp();
+                    })
+                }
+                else if ((holderHeight + distanceCovered) > lowerThreshold)
+                {
+                    $('#swiperHolder').animate({
+                        height: (holderHeight + distanceCovered)
+                    }, timeSpan, function() {
+                        slidesMiddled();
+                    })
+                }
+            }
+            else
+            {
+                if ((holderHeight - lowerThreshold) < 40)
+                {
+                    slidesDown();
+                }
+
+                else if ((upperThreshold - holderHeight) < 40)
+                {
+                    slidesUp();
+                }
+                else
+                {
+                    slidesMiddled();
+                }
+            }
+        });*/
+
+        /*$('body').on('mousedown touchstart', '.title', function(e)
+        {
             e.stopPropagation();
             mouseDownOnTitle = true;
             holderHeight = $('#swiperHolder').outerHeight();
@@ -286,6 +456,8 @@ if (!empty($_GET['id']))
 
             if (typeof touch !== 'undefined' && mouseDownOnTitle)
             {
+                console.dir(touch)
+                console.log(mouseDownOnTitle)
 
                 holderHeight = $('#swiperHolder').outerHeight();
                 distanceFromBottom = (screenHeight - touch.pageY);
@@ -299,6 +471,7 @@ if (!empty($_GET['id']))
         }).on('mouseup touchend', '.title', function(e){
 
             mouseDownOnTitle = false;
+
             var timeSpan = (e.timeStamp - dragStartTime);
             var touch = e.originalEvent;
 
@@ -308,6 +481,7 @@ if (!empty($_GET['id']))
             }
             if (typeof touch !== 'undefined')
             {
+                console.log('here');
                 distanceFromBottom = (screenHeight - touch.pageY);
                 distanceCovered = (distanceFromBottom - originalDistanceFromBottom);
                 holderHeight = $('#swiperHolder').outerHeight();
@@ -358,7 +532,7 @@ if (!empty($_GET['id']))
                     }
                 }
             }
-        });
+        });*/
 
 
         $('.next').on('click',function(e){
@@ -370,7 +544,7 @@ if (!empty($_GET['id']))
             e.preventDefault();
             var index = $('li').index($(this));
             mainSwiper.swipeTo(index+1);
-        })
+        });
 
 
         <?php
@@ -402,8 +576,8 @@ if (!empty($_GET['id']))
 
         var mainSwiper = new Swiper('.swiper-container',
         {
-            pagination: '.pagination',
-            paginationClickable: true,
+            /*pagination: '.pagination',
+            paginationClickable: true,*/
             centeredSlides: true,
             slidesPerView: 'auto',
             resizeReInit: true,
