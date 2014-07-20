@@ -158,6 +158,21 @@ if (!empty($_GET['id']))
         <div class="pagination"></div>
     </div>-->
 
+    <div id="indicatorContainer" class="indicatorContainer">
+        <ul>
+            <li>&nbsp;</li>
+            <?php
+            $j = 1;
+            foreach ($selectedLocations as $selectedLocation)
+            {?>
+            <li><a href="#"><?=$j?></a></li>
+            <?php
+            $j++;
+            }
+            ?>
+        </ul>
+    </div>
+
     <div class="map-large" id="mapCanvas">
 
     </div>
@@ -191,6 +206,25 @@ if (!empty($_GET['id']))
         var blurredTopHeight = $('#blurredTop').outerHeight();
         var introContentHeight = (screenHeight - bottomElementHeight) + blurredTopHeight;
         var introIn = true;
+
+        var indicatorObjArray;
+        var indicatorItemWidth = 0;
+        var indicatorPadding = 0;
+
+        indicatorSize();
+
+        console.log('indicatorItemWIdth:' + indicatorItemWidth);
+
+        function indicatorSize()
+        {
+            indicatorObjArray = $('#indicatorContainer ul li');
+            indicatorItemWidth = indicatorObjArray.outerWidth();
+            indicatorPadding = (screenWidth - indicatorItemWidth) / 2;
+            $('#indicatorContainer').css({
+                width: indicatorItemWidth * indicatorObjArray.length ,
+                padding:  "0 " + indicatorPadding + "px"
+            });
+        }
 
         $('#introContent').css({
             height: introContentHeight
@@ -244,7 +278,6 @@ if (!empty($_GET['id']))
         }
 
         window.addEventListener('orientationchange', doOnOrientationChange);
-
 
 
         var dragStartTime = 0;
@@ -354,187 +387,6 @@ if (!empty($_GET['id']))
         });
 
 
-        /*$('body').on('mousedown touchstart', '.title', function(e)
-        {
-            e.stopPropagation();
-            holderHeight = $('#swiperHolder').outerHeight();
-            dragStartTime = e.timeStamp;
-            dragStartY = e.originalEvent.pageY;
-            distanceFromBottom = (screenHeight - dragStartY);
-            dragHolderDiff = (holderHeight - distanceFromBottom);
-            originalDistanceFromBottom = distanceFromBottom;
-
-        }).on('mousemove touchmove', '.title', function(e){
-            e.stopPropagation();
-            e.preventDefault();
-            var touch = e.originalEvent.touches[0] || e.originalEvent.changedTouches[0];
-            holderHeight = $('#swiperHolder').outerHeight();
-            distanceFromBottom = (screenHeight - touch.pageY);
-            if (dragStartY > 0 && ((distanceFromBottom + dragHolderDiff) < upperThreshold) && ((distanceFromBottom + dragHolderDiff) > lowerThreshold))
-            {
-                $('#swiperHolder').css({
-                    height: ((screenHeight - touch.pageY) + dragHolderDiff)
-                })
-            }
-        }).on('mouseup touchend', '.title', function(e){
-
-            var timeSpan = (e.timeStamp - dragStartTime);
-            var touch = e.originalEvent.touches[0] || e.originalEvent.changedTouches[0];
-            distanceFromBottom = (screenHeight - touch.pageY);
-            distanceCovered = (distanceFromBottom - originalDistanceFromBottom);
-            holderHeight = $('#swiperHolder').outerHeight();
-
-            var velocity = (timeSpan/Math.abs(distanceCovered));
-
-            if (velocity < 5)
-            {
-                if ((holderHeight + distanceCovered) < lowerThreshold)
-                {
-                    $('#swiperHolder').animate({
-                        height: lowerThreshold
-                    }, timeSpan, function() {
-                        slidesDown();
-                    })
-                }
-                else if ((holderHeight + distanceCovered) > upperThreshold)
-                {
-                    $('#swiperHolder').animate({
-                        height: upperThreshold
-                    }, timeSpan, function() {
-                        slidesUp();
-                    })
-                }
-                else if ((holderHeight + distanceCovered) > lowerThreshold)
-                {
-                    $('#swiperHolder').animate({
-                        height: (holderHeight + distanceCovered)
-                    }, timeSpan, function() {
-                        slidesMiddled();
-                    })
-                }
-            }
-            else
-            {
-                if ((holderHeight - lowerThreshold) < 40)
-                {
-                    slidesDown();
-                }
-
-                else if ((upperThreshold - holderHeight) < 40)
-                {
-                    slidesUp();
-                }
-                else
-                {
-                    slidesMiddled();
-                }
-            }
-        });*/
-
-        /*$('body').on('mousedown touchstart', '.title', function(e)
-        {
-            e.stopPropagation();
-            mouseDownOnTitle = true;
-            holderHeight = $('#swiperHolder').outerHeight();
-            dragStartTime = e.timeStamp;
-            dragStartY = e.originalEvent.pageY;
-            distanceFromBottom = (screenHeight - dragStartY);
-            dragHolderDiff = (holderHeight - distanceFromBottom);
-            originalDistanceFromBottom = distanceFromBottom;
-
-        }).on('mousemove touchmove', '.title', function(e){
-            //e.stopPropagation();
-            e.preventDefault();
-
-            var touch = e.originalEvent;
-
-            if (touch.hasOwnProperty('touches'))
-            {
-                touch = e.originalEvent.touches[0];
-            }
-
-
-            if (typeof touch !== 'undefined' && mouseDownOnTitle)
-            {
-                console.dir(touch)
-                console.log(mouseDownOnTitle)
-
-                holderHeight = $('#swiperHolder').outerHeight();
-                distanceFromBottom = (screenHeight - touch.pageY);
-                if (dragStartY > 0 && ((distanceFromBottom + dragHolderDiff) < upperThreshold) && ((distanceFromBottom + dragHolderDiff) > lowerThreshold))
-                {
-                    $('#swiperHolder').css({
-                        height: ((screenHeight - touch.pageY) + dragHolderDiff)
-                    })
-                }
-            }
-        }).on('mouseup touchend', '.title', function(e){
-
-            mouseDownOnTitle = false;
-
-            var timeSpan = (e.timeStamp - dragStartTime);
-            var touch = e.originalEvent;
-
-            if (touch.hasOwnProperty('touches'))
-            {
-                touch = e.originalEvent.touches[0];
-            }
-            if (typeof touch !== 'undefined')
-            {
-                console.log('here');
-                distanceFromBottom = (screenHeight - touch.pageY);
-                distanceCovered = (distanceFromBottom - originalDistanceFromBottom);
-                holderHeight = $('#swiperHolder').outerHeight();
-
-                var velocity = (timeSpan/Math.abs(distanceCovered));
-
-                if (velocity < 5)
-                {
-                    if ((holderHeight + distanceCovered) < lowerThreshold)
-                    {
-                        $('#swiperHolder').animate({
-                            height: lowerThreshold
-                        }, timeSpan, function() {
-                            slidesDown();
-                        })
-                    }
-                    else if ((holderHeight + distanceCovered) > upperThreshold)
-                    {
-                        $('#swiperHolder').animate({
-                            height: upperThreshold
-                        }, timeSpan, function() {
-                            slidesUp();
-                        })
-                    }
-                    else if ((holderHeight + distanceCovered) > lowerThreshold)
-                    {
-                        $('#swiperHolder').animate({
-                            height: (holderHeight + distanceCovered)
-                        }, timeSpan, function() {
-                            slidesMiddled();
-                        })
-                    }
-                }
-                else
-                {
-                    if ((holderHeight - lowerThreshold) < 40)
-                    {
-                        slidesDown();
-                    }
-
-                    else if ((upperThreshold - holderHeight) < 40)
-                    {
-                        slidesUp();
-                    }
-                    else
-                    {
-                        slidesMiddled();
-                    }
-                }
-            }
-        });*/
-
-
         $('.next').on('click',function(e){
             e.preventDefault();
             mainSwiper.swipeTo(1);
@@ -584,9 +436,29 @@ if (!empty($_GET['id']))
             queueEndCallbacks: true,
             onSlideChangeEnd: function(swiper)
             {
+                var direction = '';
+                var indicatorStepDiff = 0;
+                var indicatorScroll = 0;
                 activeIndex = swiper.activeIndex;
                 previousIndex = swiper.previousIndex;
                 activeSlide = $('.swiper-slide').eq(activeIndex);
+
+                if (activeIndex > previousIndex) {
+                    direction = 'right';
+                    indicatorStepDiff = (activeIndex - previousIndex);
+                    indicatorScroll = $('#indicatorContainer').offset().left - (indicatorItemWidth * indicatorStepDiff);
+                }
+                else if (previousIndex > activeIndex)
+                {
+                    direction = 'left';
+                    indicatorStepDiff = (previousIndex - activeIndex);
+                    indicatorScroll = $('#indicatorContainer').offset().left + (indicatorItemWidth * indicatorStepDiff);
+                }
+
+                $('#indicatorContainer').animate({
+                    left: ""+indicatorScroll+"px"
+                },500)
+
 
                 if (previousIndex > 0)
                 {

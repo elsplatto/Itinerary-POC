@@ -36,6 +36,27 @@ body {
   .introContainer.in .introContent .chevron.back {
     position: fixed; }
 
+.indicatorContainer {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  height: auto;
+  z-index: 180;
+  background-color: red; }
+  .indicatorContainer ul {
+    position: relative;
+    padding: 5px 0;
+    list-style-type: none;
+    display: block; }
+    .indicatorContainer ul li {
+      position: relative;
+      float: left;
+      width: 35vw;
+      text-align: center;
+      outline: 1px solid blue; }
+      .indicatorContainer ul li a {
+        color: white; }
+
 .introContainer {
   position: absolute;
   top: 0;
