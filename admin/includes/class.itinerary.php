@@ -214,10 +214,10 @@ class Itinerary {
     private function getLocations($id)
     {
         $dbConnection = new DatabaseConnection();
-        $query = 'SELECT il.id, il.title, il.image_landscape, il.image_portrait, il.content, il.lat, il.lng, il.tags FROM itinerary_locations il JOIN itinerary_itinerary_location iil ON iil.itinerary_location_id = il.id WHERE iil.itinerary_id = ? ORDER BY iil.sequence';
+        $query = 'SELECT il.id, il.title, il.address, il.image_landscape, il.image_portrait, il.content, il.lat, il.lng, il.tags FROM itinerary_locations il JOIN itinerary_itinerary_location iil ON iil.itinerary_location_id = il.id WHERE iil.itinerary_id = ? ORDER BY iil.sequence';
         $types = 'i';
         $params = array(intval($id));
-        $results = array($locationId = 0, $title = '', $image_landscape = '', $image_portrait = '', $content = '', $lat = 0, $lng = 0, $tags = '');
+        $results = array($locationId = 0, $address = '', $title = '', $image_landscape = '', $image_portrait = '', $content = '', $lat = 0, $lng = 0, $tags = '');
         $records = $dbConnection->getRecords($query, $types, $params, $results);
         unset($dbConnection);
         return $records;
@@ -309,7 +309,7 @@ class Itinerary {
         {
             $manifestImgs .= $this->img_list[$i] ."\n";
         }
-        echo($manifestImgs);
+        //echo($manifestImgs);
 
 $manifest = <<< EOF
 CACHE MANIFEST
@@ -375,18 +375,16 @@ EOF;
         array_push($this->img_list, $this->baseURL . $this->portrait_path . $this->image_portrait);
 
 
-        /*foreach ($results as $result)
-        {
-            $json .= json_encode($result);
-        }*/
+        $results[0]['description'] = str_replace(array("\n", "\t", "\r"), '', $results[0]['description']);
 
-        $json .= '"title":'.json_encode($results[0]['title']).',';
-        $json .= '"page_name":'.json_encode($results[0]['page_name']).',';
-        $json .= '"sub_title":'.json_encode($results[0]['sub_title']).',';
-        $json .= '"intro_text":'.json_encode($results[0]['intro_text']).',';
-        $json .= '"description":'.json_encode($results[0]['description']).',';
-        $json .= '"image_landscape":'.json_encode($results[0]['image_landscape']).',';
-        $json .= '"image_portrait":'.json_encode($results[0]['image_portrait']).',';
+
+        $json .= '"title":"'.stripcslashes($results[0]['title']).'",';
+        $json .= '"page_name":"'.stripcslashes($results[0]['page_name']).'",';
+        $json .= '"sub_title":"'.stripcslashes($results[0]['sub_title']).'",';
+        $json .= '"intro_text":"'.stripcslashes($results[0]['intro_text']).'",';
+        $json .= '"description":"'. stripcslashes($results[0]['description']).'",';
+        $json .= '"image_landscape":"'.$results[0]['image_landscape'].'",';
+        $json .= '"image_portrait":"'.$results[0]['image_portrait'].'",';
         $json .= '"date_created":'.$results[0]['date_created'].',';
         $json .= '"date_last_modified":'.$results[0]['date_last_modified'];
 
@@ -398,18 +396,24 @@ EOF;
 
         while($row = $this->obj_locations->fetch_array(MYSQLI_ASSOC))
         {
+            $content = '';
+            $content = $row['content'];
+            $content = str_replace(array("\n","\t","\r"), '', $content);
+            $content = stripcslashes($content);
+
             $json .= '{';
             $json .= '"id":' . $row['id'] . ',';
             $json .= '"title":"' . $row['title'] . '",';
+            $json .= '"address":"' . stripcslashes($row['address']) . '",';
             $json .= '"images": {';
-            $json .= '"large":' . json_encode($this->baseURL . $this->location_landscape_path_lge . $row['image_landscape']) . ',';
-            $json .= '"medium":' . json_encode($this->baseURL . $this->location_landscape_path_med . $row['image_landscape']) . ',';
-            $json .= '"small":' . json_encode($this->baseURL . $this->location_landscape_path_sml . $row['image_landscape']);
+            $json .= '"large":"' . $this->baseURL . $this->location_landscape_path_lge . $row['image_landscape'] . '",';
+            $json .= '"medium":"' . $this->baseURL . $this->location_landscape_path_med . $row['image_landscape'] . '",';
+            $json .= '"small":"' . $this->baseURL . $this->location_landscape_path_sml . $row['image_landscape'] . '"';
             $json .= '},';
-            $json .= '"content":'.json_encode($row['content']).',';
+            $json .= '"content":"'. stripcslashes($content) .'",';
             $json .= '"lat":' . $row['lat'] . ',';
             $json .= '"lng":' . $row['lng'] . ',';
-            $json .= '"tags":' . json_encode($row['tags']);
+            $json .= '"tags":"' . $row['tags'] .'"';
             $json .= '}';
 
             array_push($this->img_list, $this->baseURL . $this->location_landscape_path_med . $row['image_landscape']);
@@ -446,8 +450,17 @@ EOF;
         {
             unlink('../json/'.$previous_json_filename);
         }
-
+        if (file_exists('../json/itinerary-'.$this->itineraryId.'.json'))
+        {
+            unlink('../json/itinerary-'.$this->itineraryId.'.json');
+        }
+        //this file for manifest
         $file = fopen('../json/'.$json_filename,'w');
+        fwrite($file, $json);
+        fclose($file);
+
+        //this file for mobile etc
+        $file = fopen('../json/itinerary-'.$this->itineraryId.'.json','w');
         fwrite($file, $json);
         fclose($file);
     }

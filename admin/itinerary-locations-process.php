@@ -13,7 +13,9 @@ if (!empty($_POST))
     $address = $_POST['txtAddress'];
     $lat = $_POST['txtLat'];
     $lng = $_POST['txtLng'];
-    $content =$_POST['txtContent'];
+    $content = $_POST['txtContent'];
+    $content = str_replace("\n", '', $content);
+    $content = str_replace("\r", '', $content);
     $image_landscape = $_POST['txtImgLandscape'];
     //$image_portrait = $_POST['txtImgPortrait'];
     $tags = $_POST['txtTags'];

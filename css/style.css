@@ -38,24 +38,79 @@ body {
 
 .indicatorContainer {
   position: fixed;
-  bottom: 0;
+  bottom: -50px;
   width: 100%;
   height: auto;
   z-index: 180;
-  background-color: red; }
+  background-color: #333333; }
   .indicatorContainer ul {
+    margin: 0;
     position: relative;
     padding: 5px 0;
     list-style-type: none;
-    display: block; }
+    display: block;
+    overflow: hidden; }
     .indicatorContainer ul li {
       position: relative;
       float: left;
       width: 35vw;
-      text-align: center;
-      outline: 1px solid blue; }
-      .indicatorContainer ul li a {
+      text-align: center; }
+      .indicatorContainer ul li:after {
+        content: "";
+        position: absolute;
+        z-index: -2;
+        display: block;
+        height: 1px;
+        width: 100%;
+        top: 13px;
+        background: #fd8424; }
+      .indicatorContainer ul li:first-child:after {
+        background: none; }
+      .indicatorContainer ul li:nth-child(2):after {
+        width: 50%;
+        right: 0; }
+      .indicatorContainer ul li:last-child:after {
+        width: 50%;
+        left: 0; }
+      .indicatorContainer ul li div.distance {
+        position: absolute;
+        z-index: 190;
+        top: 0;
+        font-size: 8px;
+        right: 0;
+        margin-right: -15%;
         color: white; }
+      .indicatorContainer ul li a {
+        position: relative;
+        color: white;
+        font-size: 10px;
+        width: 16px;
+        height: 21px;
+        text-align: center;
+        display: inline-block;
+        text-decoration: none; }
+        .indicatorContainer ul li a:before {
+          content: "";
+          z-index: -1;
+          position: absolute;
+          width: 16px;
+          height: 21px;
+          top: 0px;
+          left: 0px;
+          background-image: url("img/sprite.png");
+          background-position: 0px -58px; }
+    .indicatorContainer ul .active a {
+      color: #333333; }
+      .indicatorContainer ul .active a:before {
+        content: "";
+        z-index: -1;
+        position: absolute;
+        width: 16px;
+        height: 21px;
+        top: 0px;
+        left: 0px;
+        background-image: url("img/sprite.png");
+        background-position: -23px -58px; }
 
 .introContainer {
   position: absolute;

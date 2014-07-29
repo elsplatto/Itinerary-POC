@@ -46,24 +46,83 @@ body
 
 .indicatorContainer
   position: fixed
-  bottom: 0
+  bottom: -50px
   width: 100%
   height: auto
   z-index: 180
-  background-color: #f00
+  background-color: #333
   ul
+    margin: 0
     position: relative
     padding: 5px 0
     list-style-type: none
     display: block
+    overflow: hidden
     li
       position: relative
       float: left
       width: 35vw
       text-align: center
-      outline: 1px solid blue
-      a
+      &:after
+        content: ""
+        position: absolute
+        z-index: -2
+        display: block
+        height: 1px
+        width: 100%
+        top: 13px
+        background: #fd8424
+      &:first-child
+        &:after
+          background: none
+      &:nth-child(2)
+        &:after
+          width: 50%
+          right: 0
+      &:last-child
+        &:after
+          width: 50%
+          left: 0
+      div.distance
+        position: absolute
+        z-index: 190
+        top: 0
+        font-size: 8px
+        right: 0
+        margin-right: -15%
         color: #fff
+      a
+        position: relative
+        color: #fff
+        font-size: 10px
+        width: 16px
+        height: 21px
+        text-align: center
+        display: inline-block
+        text-decoration: none
+        &:before
+          content: ""
+          z-index: -1
+          position: absolute
+          width: 16px
+          height: 21px
+          top: 0px
+          left: 0px
+          background-image: url("img/sprite.png")
+          background-position: 0px -58px
+    .active
+      a
+        color: #333
+        &:before
+          content: ""
+          z-index: -1
+          position: absolute
+          width: 16px
+          height: 21px
+          top: 0px
+          left: 0px
+          background-image: url("img/sprite.png")
+          background-position: -23px -58px
 
 
 

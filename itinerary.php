@@ -108,10 +108,9 @@ if (!empty($_GET['id']))
             <div id="swiperWrapper" class="swiper-wrapper">
 
                 <div class="swiper-slide white-slide index">
-                    <!--a class="toggle-up-down slide-up"></a-->
+                    <a href="#" class="chevron next slideToFirst"></a>
                     <div class="title" id="title-0">
                         <h2><?=$itineraryDetail['title']?></h2>
-                        <a href="#" class="chevron next"></a>
                         <span><?=$itineraryDetail['sub_title']?></span>
                     </div>
                     <div class="contentHolder">
@@ -139,7 +138,6 @@ if (!empty($_GET['id']))
                         <!--a class="toggle-up-down slide-up"></a-->
                         <div class="title" id="title-<?=$j?>">
                             <h2><?=$selectedLocation['title']?></h2>
-                            <!--span><?=$selectedLocation['sub_title']?></span-->
                         </div>
                         <div class="contentHolder">
                             <img src="img/itineraries/locations/landscape/med/<?=$selectedLocation['image_landscape']?>" alt="" />
@@ -154,10 +152,6 @@ if (!empty($_GET['id']))
         </div>
     </div>
 
-   <!-- <div class="paginationHolder">
-        <div class="pagination"></div>
-    </div>-->
-
     <div id="indicatorContainer" class="indicatorContainer">
         <ul>
             <li>&nbsp;</li>
@@ -166,6 +160,7 @@ if (!empty($_GET['id']))
             foreach ($selectedLocations as $selectedLocation)
             {?>
             <li><a href="#"><?=$j?></a></li>
+
             <?php
             $j++;
             }
@@ -213,8 +208,6 @@ if (!empty($_GET['id']))
 
         indicatorSize();
 
-        console.log('indicatorItemWIdth:' + indicatorItemWidth);
-
         function indicatorSize()
         {
             indicatorObjArray = $('#indicatorContainer ul li');
@@ -251,7 +244,6 @@ if (!empty($_GET['id']))
 
         $('.back-to-intro').click(function(e) {
             e.preventDefault();
-            //alert('back tapped')
             $('#introContainer').hasClass('out') && $('#introContainer').removeClass('out');
             $('#introContainer').addClass('in');
             introIn = true;
@@ -298,7 +290,7 @@ if (!empty($_GET['id']))
         {
             mouseDownOnTitle = true;
             e.preventDefault();
-            e.stopPropagation();
+            //e.stopPropagation();
             //var touch = e.originalEvent.touches[0] || e.originalEvent.changedTouches[0];
             var touch = e.originalEvent;
 
@@ -309,6 +301,7 @@ if (!empty($_GET['id']))
             distanceFromBottom = (screenHeight - dragStartY);
             dragHolderDiff = (holderHeight - distanceFromBottom);
             originalDistanceFromBottom = distanceFromBottom;
+
 
         }).on('mousemove touchmove', '.title', function(e){
             //e.stopPropagation();
@@ -387,9 +380,10 @@ if (!empty($_GET['id']))
         });
 
 
-        $('.next').on('click',function(e){
+        $('.slideToFirst').click(function(e){
             e.preventDefault();
-            mainSwiper.swipeTo(1);
+            mainSwiper.swipeTo(2);
+            console.log('here')
         });
 
         $('.indexList li').click(function(e){
@@ -436,29 +430,11 @@ if (!empty($_GET['id']))
             queueEndCallbacks: true,
             onSlideChangeEnd: function(swiper)
             {
-                var direction = '';
-                var indicatorStepDiff = 0;
-                var indicatorScroll = 0;
                 activeIndex = swiper.activeIndex;
                 previousIndex = swiper.previousIndex;
                 activeSlide = $('.swiper-slide').eq(activeIndex);
 
-                if (activeIndex > previousIndex) {
-                    direction = 'right';
-                    indicatorStepDiff = (activeIndex - previousIndex);
-                    indicatorScroll = $('#indicatorContainer').offset().left - (indicatorItemWidth * indicatorStepDiff);
-                }
-                else if (previousIndex > activeIndex)
-                {
-                    direction = 'left';
-                    indicatorStepDiff = (previousIndex - activeIndex);
-                    indicatorScroll = $('#indicatorContainer').offset().left + (indicatorItemWidth * indicatorStepDiff);
-                }
-
-                $('#indicatorContainer').animate({
-                    left: ""+indicatorScroll+"px"
-                },500)
-
+                slideIndicators(activeIndex, previousIndex);
 
                 if (previousIndex > 0)
                 {
@@ -498,7 +474,6 @@ if (!empty($_GET['id']))
             }
         });
 
-
         $('.get-position a').click(function(e) {
             e.preventDefault();
             if ($(this).hasClass('active') && markerInBounds(userLocationMarker))
@@ -528,6 +503,51 @@ if (!empty($_GET['id']))
                 getUserLocation($(this));
             }
         });
+
+        function slideIndicators(active, previous)
+        {
+            var direction = '';
+            var indicatorContainerHeight = $('#indicatorContainer').height();
+            var indicatorStepDiff = 0;
+            var indicatorScroll = 0;
+
+            $('#indicatorContainer li.active').removeClass('active');
+            $('#indicatorContainer li').eq(active).addClass('active');
+
+            if (active > previous) {
+                direction = 'right';
+                indicatorStepDiff = (active - previous);
+                indicatorScroll = $('#indicatorContainer').offset().left - (indicatorItemWidth * indicatorStepDiff);
+
+            }
+            else if (previous > active)
+            {
+                direction = 'left';
+                indicatorStepDiff = (previous - active);
+                indicatorScroll = $('#indicatorContainer').offset().left + (indicatorItemWidth * indicatorStepDiff);
+            }
+
+            if (active == 0 && direction == 'left')
+            {
+                $('#indicatorContainer').animate({
+                    bottom: "-"+indicatorContainerHeight+"px",
+                    left: ""+indicatorScroll+"px"
+                },500);
+            }
+            else if (previous == 0 && direction == 'right')
+            {
+                $('#indicatorContainer').animate({
+                    bottom: "0px",
+                    left: ""+indicatorScroll+"px"
+                },500);
+            }
+            else
+            {
+                $('#indicatorContainer').animate({
+                    left: ""+indicatorScroll+"px"
+                },500);
+            }
+        }
 
         function slidesUp()
         {
@@ -827,6 +847,11 @@ if (!empty($_GET['id']))
 
                     $('.indexList li').eq(i).append(distanceHTML);
 
+                    if (i>0 && i!=0)
+                    {
+                        $('#indicatorContainer ul li').eq(i).append(distanceHTML);
+                    }
+
                     var marker = new MarkerWithLabel({
                         index: i,
                         position: latLng,
@@ -995,7 +1020,6 @@ if (!empty($_GET['id']))
             }
 
             map.fitBounds(bounds);
-            //console.log(map.getCenter());
             var mapCenter = map.getCenter();
             activeLat = mapCenter.lat();
             activeLng = mapCenter.lng();

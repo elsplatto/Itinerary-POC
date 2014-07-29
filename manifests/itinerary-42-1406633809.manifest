@@ -1,8 +1,8 @@
 CACHE MANIFEST
-# 2014-07-17 23:22:37
+# 2014-07-29 21:36:49
 #static files
 CACHE:
-http://localhost/~jasontaikato/itinerary/itinerary/watering-holes.html
+http://localhost/~jasontaikato/itinerary/itinerary/sydney-at-night.html
 http://localhost/~jasontaikato/itinerary/css/idangerous.swiper.css
 http://localhost/~jasontaikato/itinerary/css/swiper.css
 http://localhost/~jasontaikato/itinerary/css/style.css
@@ -16,8 +16,8 @@ http://localhost/~jasontaikato/itinerary/img/marker-orange-hollow.png
 http://localhost/~jasontaikato/itinerary/img/marker-orange.png
 http://localhost/~jasontaikato/itinerary/img/location-dot.png
 #dynamic files
-http://localhost/~jasontaikato/itinerary/img/itineraries/landscape/
-http://localhost/~jasontaikato/itinerary/img/itineraries/portrait/
+http://localhost/~jasontaikato/itinerary/img/itineraries/landscape/landscape-test.png
+http://localhost/~jasontaikato/itinerary/img/itineraries/portrait/sydney-night-portrait.jpg
 http://localhost/~jasontaikato/itinerary/img/itineraries/locations/landscape/med/fortune-of-war.jpg
 http://localhost/~jasontaikato/itinerary/img/itineraries/locations/landscape/med/the-glenmore.jpg
 http://localhost/~jasontaikato/itinerary/img/itineraries/locations/landscape/med/east-village-hotel.jpg
